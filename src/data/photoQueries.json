@@ -39,10 +39,9 @@
     "raison": "Recette spécifique avec ananas mariné non standard"
   },
   "Antipasti::Polenta et Gamberi / Calamars": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Plat à options d'ingrédients (crevettes ou calamars)"
+    "requetes": ["Polenta e gamberi", "Polenta with shrimp"],
+    "mots_cles": ["gamberi", "shrimp", "prawn", "calamari", "squid"],
+    "exclu": false
   },
   "Antipasti::Tartare à l'Italienne": {
     "requetes": [],
@@ -51,16 +50,14 @@
     "raison": "Création maison spécifique de tartare au couteau avec tomates et basilic"
   },
   "Antipasti::Pizza Fritta": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Spécialité napolitaine pour 2 personnes, présentation et garniture variables"
+    "requetes": ["Pizza fritta", "Montanara pizza fritta", "Fried pizza Naples"],
+    "mots_cles": ["fritta", "fried", "montanara"],
+    "exclu": false
   },
   "Antipasti::Noix de Saint Jacques Poelées et Pancetta": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Recette d'auteur mer-charcuterie non standardisée"
+    "requetes": ["Capesante pancetta", "Seared scallops pancetta"],
+    "mots_cles": ["scallop", "capesante"],
+    "exclu": false
   },
   "Antipasti::Prosciutto di Parma": {
     "requetes": ["Prosciutto di Parma", "Prosciutto crudo di Parma", "Parma ham platter"],
@@ -89,10 +86,9 @@
     "exclu": false
   },
   "I Classici Italiani::Tagliatelle Bolognese": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Plat à options d'ingrédients (option Jambon / Champignon)"
+    "requetes": ["Tagliatelle al ragù", "Tagliatelle bolognese"],
+    "mots_cles": ["ragù", "ragu", "bolognese"],
+    "exclu": false
   },
   "I Classici Italiani::Spaghetti Puttanesca": {
     "requetes": ["Spaghetti alla puttanesca", "Pasta alla puttanesca", "Puttanesca"],
@@ -110,10 +106,9 @@
     "exclu": false
   },
   "I Classici Italiani::Gnocchi Maison": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Plat à choix multiples de sauces (bolognaise, 4 fromages ou Mariarosa)"
+    "requetes": ["Gnocchi di patate", "Potato gnocchi"],
+    "mots_cles": ["gnocchi"],
+    "exclu": false
   },
   "I Classici Italiani::Spaghetti à la Sicilienne": {
     "requetes": [],
@@ -132,10 +127,9 @@
     "exclu": false
   },
   "I Classici Italiani::Spaghetti Carbonara": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Création spéciale du chef avec composition non détaillée"
+    "requetes": ["Spaghetti alla carbonara", "Spaghetti carbonara"],
+    "mots_cles": ["carbonara"],
+    "exclu": false
   },
   "I Classici Italiani::Farfalle Boscaiola": {
     "requetes": ["Pasta alla boscaiola", "Farfalle alla boscaiola", "Boscaiola pasta"],
@@ -148,10 +142,9 @@
     "exclu": false
   },
   "I Classici Italiani::Lasagne Bolognese / Boscaiola": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Plat à options (Bolognese ou Boscaiola)"
+    "requetes": ["Lasagne alla bolognese", "Lasagna bolognese"],
+    "mots_cles": ["lasagna", "lasagne"],
+    "exclu": false
   },
   "I Classici Italiani::Ravioli aux Courgettes et Crevettes": {
     "requetes": [],
@@ -226,10 +219,9 @@
     "raison": "Garniture locale spécifique (poivre du pays, haricots verts, bacon)"
   },
   "Carne::Tagliata de Filet au Gorgonzola": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Recette spécifique servie avec gratin de pomme"
+    "requetes": ["Tagliata al gorgonzola", "Beef tagliata gorgonzola sauce"],
+    "mots_cles": ["gorgonzola"],
+    "exclu": false
   },
   "Carne::Paupiette de Poulet au Jambon de Parme": {
     "requetes": [],
@@ -267,10 +259,9 @@
     "exclu": false
   },
   "Pesce::Brochettes de Gambas": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Description absente et présentation générique non standardisée"
+    "requetes": ["Spiedini di gamberi", "Shrimp skewers"],
+    "mots_cles": ["gamberi", "shrimp", "prawn", "spiedini", "skewer"],
+    "exclu": false
   },
   "Le Pizze::Margherita": {
     "requetes": ["Pizza Margherita", "Neapolitan pizza Margherita", "Pizza margherita"],
@@ -349,10 +340,9 @@
     "exclu": false
   },
   "Le Pizze::Quattro Formaggi": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Composition atypique avec fromages français (Cantal, Gruyère, Brie, Camembert)"
+    "requetes": ["Pizza quattro formaggi", "Four cheese pizza"],
+    "mots_cles": ["formaggi", "four cheese"],
+    "exclu": false
   },
   "Le Pizze::Paysanne": {
     "requetes": [],
