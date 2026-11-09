@@ -1,7 +1,9 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Search, ArrowUp } from 'lucide-react';
+import { Search, ArrowUp, Camera } from 'lucide-react';
 import { RESTAURANT_DATA, Plat, CategorieMenu } from '../data/restaurantData';
 import corrections from '../data/corrections.json';
+import platPhotosData from '../data/platPhotos.json';
+import { PlatModal, PlatPhotoInfo } from './PlatModal';
 
 interface MenuSectionProps {
   onSelectPlat?: (plat: Plat) => void;
@@ -79,6 +81,13 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [showScrollTop, setShowScrollTop] = useState(false);
   const sectionRefs = useRef<Record<string, HTMLElement | null>>({});
+
+  // Gestion de la modale de photo de plat
+  const [selectedModalPlat, setSelectedModalPlat] = useState<Plat | null>(null);
+  const [selectedModalPhoto, setSelectedModalPhoto] = useState<PlatPhotoInfo | null>(null);
+  const activeTriggerRef = useRef<HTMLButtonElement | null>(null);
+
+  const platPhotosMap = platPhotosData as Record<string, PlatPhotoInfo>;
 
   const menuCategories = RESTAURANT_DATA.menu;
 
@@ -310,6 +319,8 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
                   {cat.plats.map((plat, idx) => {
                     const correctedNom = applyCorrection(plat.nom);
                     const { mainText, accompagnement } = parseDescription(plat.description);
+                    const photoKey = `${cat.categorie}::${plat.nom}`;
+                    const photoInfo = platPhotosMap[photoKey] || null;
 
                     return (
                       <li
@@ -318,9 +329,30 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
                       >
                         {/* Ligne 1 : Nom + Pointillés + Prix en police normale du site, couleur --texte, poids 600, sans fond ni bordure ni monospace */}
                         <div className="flex items-baseline justify-between gap-2 w-full">
-                          <span className="font-serif font-bold text-[#2B1A12] text-[15px] sm:text-base leading-snug break-words shrink min-w-0">
-                            {correctedNom}
-                          </span>
+                          {photoInfo ? (
+                            <button
+                              type="button"
+                              onClick={e => {
+                                activeTriggerRef.current = e.currentTarget;
+                                setSelectedModalPlat(plat);
+                                setSelectedModalPhoto(photoInfo);
+                              }}
+                              aria-haspopup="dialog"
+                              className="group text-left font-serif font-bold text-[#2B1A12] text-[15px] sm:text-base leading-snug break-words shrink min-w-0 inline-flex items-center gap-1.5 hover:text-[#A84A15] transition cursor-pointer focus-visible:ring-2 focus-visible:ring-[#EB7F36] focus-visible:outline-none rounded"
+                            >
+                              <span className="group-hover:underline decoration-[#A84A15]/40 underline-offset-2">
+                                {correctedNom}
+                              </span>
+                              <Camera
+                                className="w-3.5 h-3.5 text-[#A84A15] shrink-0 opacity-80 group-hover:opacity-100"
+                                aria-label="Voir la photo d'illustration"
+                              />
+                            </button>
+                          ) : (
+                            <span className="font-serif font-bold text-[#2B1A12] text-[15px] sm:text-base leading-snug break-words shrink min-w-0">
+                              {correctedNom}
+                            </span>
+                          )}
 
                           {/* Ligne pointillée qui ne s'affiche que s'il y a de la place */}
                           <span
@@ -380,6 +412,18 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
           <ArrowUp className="w-5 h-5" aria-hidden="true" />
         </button>
       )}
+
+      {/* Modale d'illustration détaillée du plat */}
+      <PlatModal
+        isOpen={!!selectedModalPlat}
+        onClose={() => {
+          setSelectedModalPlat(null);
+          setSelectedModalPhoto(null);
+        }}
+        plat={selectedModalPlat}
+        photoInfo={selectedModalPhoto}
+        triggerRef={activeTriggerRef}
+      />
     </section>
   );
 };

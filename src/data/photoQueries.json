@@ -1,0 +1,385 @@
+{
+  "Antipasti::Bruschetta": {
+    "requetes": ["Bruschetta al pomodoro", "Tomato basil bruschetta", "Bruschetta pomodoro"],
+    "mots_cles": ["bruschetta", "pomodoro"],
+    "exclu": false
+  },
+  "Antipasti::Salade Mixte": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Salade composée spécifique au restaurant (tomates, olives, feta, thon)"
+  },
+  "Antipasti::Bruschetta Piccola": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Création du chef (toast chèvre, jambon de Parme et miel)"
+  },
+  "Antipasti::Carpaccio de Boeuf": {
+    "requetes": ["Carpaccio di manzo", "Beef carpaccio parmesan", "Carpaccio manzo rucola"],
+    "mots_cles": ["carpaccio", "manzo"],
+    "exclu": false
+  },
+  "Antipasti::Salade Poulet et Copeaux de Parmesan": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Salade composée spécifique avec poulet, pesto et copeaux de parmesan"
+  },
+  "Antipasti::Caprese": {
+    "requetes": ["Insalata caprese", "Caprese salad", "Insalata Caprese pomodoro mozzarella"],
+    "mots_cles": ["caprese", "insalata"],
+    "exclu": false
+  },
+  "Antipasti::Carpaccio de Poisson": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Recette spécifique avec ananas mariné non standard"
+  },
+  "Antipasti::Polenta et Gamberi / Calamars": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Plat à options d'ingrédients (crevettes ou calamars)"
+  },
+  "Antipasti::Tartare à l'Italienne": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Création maison spécifique de tartare au couteau avec tomates et basilic"
+  },
+  "Antipasti::Pizza Fritta": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Spécialité napolitaine pour 2 personnes, présentation et garniture variables"
+  },
+  "Antipasti::Noix de Saint Jacques Poelées et Pancetta": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Recette d'auteur mer-charcuterie non standardisée"
+  },
+  "Antipasti::Prosciutto di Parma": {
+    "requetes": ["Prosciutto di Parma", "Prosciutto crudo di Parma", "Parma ham platter"],
+    "mots_cles": ["prosciutto", "parma"],
+    "exclu": false
+  },
+  "Antipasti::Mozarella du Bufala": {
+    "requetes": ["Mozzarella di bufala campana", "Mozzarella di bufala", "Buffalo mozzarella"],
+    "mots_cles": ["mozzarella", "bufala"],
+    "exclu": false
+  },
+  "Antipasti::Salade Italienne": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Salade composée maison (mozzarella, jambon de Parme, salade)"
+  },
+  "Antipasti::Affettato Misto": {
+    "requetes": ["Affettato misto", "Tagliere di salumi italiani", "Italian cold cuts platter"],
+    "mots_cles": ["affettato", "salumi"],
+    "exclu": false
+  },
+  "I Classici Italiani::Penne Arrabiata": {
+    "requetes": ["Penne all'arrabbiata", "Penne all'arrabbiata pasta", "Penne arrabbiata"],
+    "mots_cles": ["arrabbiata", "penne"],
+    "exclu": false
+  },
+  "I Classici Italiani::Tagliatelle Bolognese": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Plat à options d'ingrédients (option Jambon / Champignon)"
+  },
+  "I Classici Italiani::Spaghetti Puttanesca": {
+    "requetes": ["Spaghetti alla puttanesca", "Pasta alla puttanesca", "Puttanesca"],
+    "mots_cles": ["puttanesca", "spaghetti"],
+    "exclu": false
+  },
+  "I Classici Italiani::Penne Pesto": {
+    "requetes": ["Penne al pesto", "Penne pesto genovese", "Pasta al pesto"],
+    "mots_cles": ["pesto", "penne"],
+    "exclu": false
+  },
+  "I Classici Italiani::Tortiglioni alla Norma": {
+    "requetes": ["Pasta alla Norma", "Tortiglioni alla Norma", "Spaghetti alla Norma"],
+    "mots_cles": ["norma", "melanzane"],
+    "exclu": false
+  },
+  "I Classici Italiani::Gnocchi Maison": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Plat à choix multiples de sauces (bolognaise, 4 fromages ou Mariarosa)"
+  },
+  "I Classici Italiani::Spaghetti à la Sicilienne": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Création du chef, variante maison non documentée"
+  },
+  "I Classici Italiani::Linguine Amatriciana": {
+    "requetes": ["Spaghetti all'amatriciana", "Pasta all'amatriciana", "Bucatini all'amatriciana"],
+    "mots_cles": ["amatriciana", "pasta"],
+    "exclu": false
+  },
+  "I Classici Italiani::Rigatoni Cacio Pepe": {
+    "requetes": ["Rigatoni cacio e pepe", "Cacio e pepe", "Spaghetti cacio e pepe"],
+    "mots_cles": ["cacio", "pepe"],
+    "exclu": false
+  },
+  "I Classici Italiani::Spaghetti Carbonara": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Création spéciale du chef avec composition non détaillée"
+  },
+  "I Classici Italiani::Farfalle Boscaiola": {
+    "requetes": ["Pasta alla boscaiola", "Farfalle alla boscaiola", "Boscaiola pasta"],
+    "mots_cles": ["boscaiola", "pasta"],
+    "exclu": false
+  },
+  "I Classici Italiani::Ravioli Ricotta Spinaci": {
+    "requetes": ["Ravioli ricotta e spinaci", "Ravioli ricotta spinaci", "Ricotta spinach ravioli"],
+    "mots_cles": ["ravioli", "ricotta"],
+    "exclu": false
+  },
+  "I Classici Italiani::Lasagne Bolognese / Boscaiola": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Plat à options (Bolognese ou Boscaiola)"
+  },
+  "I Classici Italiani::Ravioli aux Courgettes et Crevettes": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Farce spécifique courgettes et crevettes sans référence visuelle standard"
+  },
+  "I Classici Italiani::Tagliatelle au Saumon": {
+    "requetes": ["Tagliatelle al salmone", "Pasta al salmone", "Salmon tagliatelle"],
+    "mots_cles": ["salmone", "tagliatelle"],
+    "exclu": false
+  },
+  "I Classici Italiani::Spaghetti Gambas, Lardon, Crème, Piment": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Création du chef terre-mer spécifique"
+  },
+  "I Classici Italiani::Bis di Pasta": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Plat à choix (deux variétés de pâtes au choix)"
+  },
+  "I Classici Italiani::Tris di Pasta": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Plat à choix (trois variétés de pâtes au choix)"
+  },
+  "I Classici Italiani::Tris del Giorno": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Plat à choix (trois variétés de pâtes du jour)"
+  },
+  "Carne::Ossobuco servi avec Tagliatelle": {
+    "requetes": ["Ossobuco alla milanese", "Ossobuco con pasta", "Ossobuco"],
+    "mots_cles": ["ossobuco", "veal"],
+    "exclu": false
+  },
+  "Carne::Emincée de Porc": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Recette maison à la crème et au cognac non standardisée"
+  },
+  "Carne::Tagliata Grillé à l'Italienne": {
+    "requetes": ["Tagliata di manzo con rucola", "Tagliata di manzo", "Beef tagliata arugula"],
+    "mots_cles": ["tagliata", "manzo"],
+    "exclu": false
+  },
+  "Carne::Cotoletta de Porc à la Milanaise": {
+    "requetes": ["Cotoletta alla milanese", "Milanese cutlet", "Cotoletta panata"],
+    "mots_cles": ["cotoletta", "milanese"],
+    "exclu": false
+  },
+  "Carne::Saltinbocca": {
+    "requetes": ["Saltimbocca alla romana", "Saltimbocca", "Veal saltimbocca"],
+    "mots_cles": ["saltimbocca", "romana"],
+    "exclu": false
+  },
+  "Carne::Escalope de Porc au Limone": {
+    "requetes": ["Scaloppine al limone", "Scaloppina al limone", "Pork scallopini lemon"],
+    "mots_cles": ["scaloppine", "limone"],
+    "exclu": false
+  },
+  "Carne::Tagliata au Poivre du Pays": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Garniture locale spécifique (poivre du pays, haricots verts, bacon)"
+  },
+  "Carne::Tagliata de Filet au Gorgonzola": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Recette spécifique servie avec gratin de pomme"
+  },
+  "Carne::Paupiette de Poulet au Jambon de Parme": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Création maison sur lit de tomates et vinaigre balsamique"
+  },
+  "Pesce::Bar ou Capitaine Grillé": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Poisson local d'eau douce (Capitaine) et plat à option"
+  },
+  "Pesce::Capitaine al Cartoccio": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Poisson local camerounais (Capitaine / perche du Nil)"
+  },
+  "Pesce::Bocconcini de Capitaine con Pancetta": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Création maison avec poisson local Capitaine"
+  },
+  "Pesce::Bar ou Capitaine au Poivre Vert": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Poisson local (Capitaine) et plat à option"
+  },
+  "Pesce::Gambas Sautées à l'Ail": {
+    "requetes": ["Garlic prawns", "Gamberi all'aglio", "Gambas al ajillo"],
+    "mots_cles": ["gamberi", "prawns"],
+    "exclu": false
+  },
+  "Pesce::Brochettes de Gambas": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Description absente et présentation générique non standardisée"
+  },
+  "Le Pizze::Margherita": {
+    "requetes": ["Pizza Margherita", "Neapolitan pizza Margherita", "Pizza margherita"],
+    "mots_cles": ["margherita", "pizza"],
+    "exclu": false
+  },
+  "Le Pizze::Manu": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Nom maison du restaurant"
+  },
+  "Le Pizze::Vegetarianna": {
+    "requetes": ["Pizza vegetariana", "Vegetarian pizza", "Pizza verdure"],
+    "mots_cles": ["vegetariana", "pizza"],
+    "exclu": false
+  },
+  "Le Pizze::Jambon Cuit": {
+    "requetes": ["Pizza con prosciutto cotto", "Pizza prosciutto cotto", "Ham pizza"],
+    "mots_cles": ["prosciutto", "pizza"],
+    "exclu": false
+  },
+  "Le Pizze::Saporita": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Nom maison et recette personnalisée (feta et ail)"
+  },
+  "Le Pizze::Napolitana": {
+    "requetes": ["Pizza napoletana acciughe", "Pizza romana acciughe", "Pizza anchovies capers"],
+    "mots_cles": ["acciughe", "pizza"],
+    "exclu": false
+  },
+  "Le Pizze::Prosciutto Funghi": {
+    "requetes": ["Pizza prosciutto e funghi", "Pizza prosciutto funghi", "Ham mushroom pizza"],
+    "mots_cles": ["funghi", "pizza"],
+    "exclu": false
+  },
+  "Le Pizze::Calzone": {
+    "requetes": ["Calzone pizza", "Pizza calzone ripieno", "Calzone"],
+    "mots_cles": ["calzone", "pizza"],
+    "exclu": false
+  },
+  "Le Pizze::Venezia": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Nom maison du restaurant"
+  },
+  "Le Pizze::Regina": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Composition maison avec œuf différant de la pizza reine/regina classique"
+  },
+  "Le Pizze::Diavola": {
+    "requetes": ["Pizza alla diavola", "Pizza diavola", "Pepperoni pizza diavola"],
+    "mots_cles": ["diavola", "pizza"],
+    "exclu": false
+  },
+  "Le Pizze::Vesuvio": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Composition atypique (merguez et chorizo) différant de la pizza italienne classique"
+  },
+  "Le Pizze::Padrino": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Nom maison du restaurant"
+  },
+  "Le Pizze::Cappriciosa": {
+    "requetes": ["Pizza capricciosa", "Pizza alla capricciosa", "Capricciosa pizza"],
+    "mots_cles": ["capricciosa", "pizza"],
+    "exclu": false
+  },
+  "Le Pizze::Quattro Formaggi": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Composition atypique avec fromages français (Cantal, Gruyère, Brie, Camembert)"
+  },
+  "Le Pizze::Paysanne": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Nom maison et recette personnalisée (oignons, saucisson, feta)"
+  },
+  "Le Pizze::Don Elio": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Nom maison du restaurant"
+  },
+  "Le Pizze::Frutti di Mare": {
+    "requetes": ["Pizza ai frutti di mare", "Seafood pizza", "Pizza frutti di mare"],
+    "mots_cles": ["frutti di mare", "seafood"],
+    "exclu": false
+  },
+  "Le Pizze::Pizza PV": {
+    "requetes": [],
+    "mots_cles": [],
+    "exclu": true,
+    "raison": "Nom maison et recette signature spécifique du restaurant Piccola Venezia"
+  },
+  "Le Pizze::Parma": {
+    "requetes": ["Pizza con prosciutto di Parma", "Pizza crudo di Parma", "Prosciutto di Parma pizza"],
+    "mots_cles": ["prosciutto", "parma"],
+    "exclu": false
+  }
+}
