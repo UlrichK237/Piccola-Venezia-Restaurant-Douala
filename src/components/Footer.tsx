@@ -54,7 +54,7 @@ export const Footer: React.FC = () => {
           </div>
           {MODE_DEMO && (
             <div>
-              Maquette de démonstration, non officielle
+              Site officiel
             </div>
           )}
         </div>

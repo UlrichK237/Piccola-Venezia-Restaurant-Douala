@@ -8,7 +8,7 @@ export const Navbar: React.FC = () => {
   const lieu = RESTAURANT_DATA.lieux[0];
 
   return (
-    <header className="sticky top-0 z-40 w-full bg-[#FBF6EE] border-b border-[#EADFCF]">
+    <header className="sticky top-0 z-40 w-full bg-[#EB7F36] border-b border-[#EADFCF]">
       {/* Bandeau discret et fixe (affiché uniquement si MODE_DEMO et BANDEAU_DEMO_HAUT sont vrais) */}
       {MODE_DEMO && BANDEAU_DEMO_HAUT && (
         <div className="bg-[#EB7F36] text-[#2B1A12] px-4 py-1.5 text-center text-xs font-medium border-b border-[#D76E27]">
