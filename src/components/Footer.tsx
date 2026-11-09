@@ -1,6 +1,7 @@
 import React from 'react';
 import { ArrowUp } from 'lucide-react';
 import { RESTAURANT_DATA } from '../data/restaurantData';
+import { MODE_DEMO } from '../config';
 
 export const Footer: React.FC = () => {
   const lieu = RESTAURANT_DATA.lieux[0];
@@ -15,7 +16,7 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
             <img
-              src="/public/assets/logo_5b391c43.png"
+              src="/assets/logo_5b391c43.png"
               alt="L'italien Piccola Venezia"
               className="max-w-[200px] w-auto h-8 object-contain"
             />
@@ -51,9 +52,11 @@ export const Footer: React.FC = () => {
           <div>
             © {new Date().getFullYear()} {RESTAURANT_DATA.restaurant.nom}
           </div>
-          <div>
-            Maquette de démonstration, non officielle
-          </div>
+          {MODE_DEMO && (
+            <div>
+              Maquette de démonstration, non officielle
+            </div>
+          )}
         </div>
       </div>
     </footer>

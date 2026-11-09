@@ -172,7 +172,7 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
     <section
       id="menu"
       aria-label="Menu"
-      className="py-14 px-4 sm:px-6 bg-[#FBF6EE] text-[#2B1A12] border-t border-[#EADFCF]"
+      className="scroll-mt-16 py-14 px-4 sm:px-6 bg-[#FBF6EE] text-[#2B1A12] border-t border-[#EADFCF]"
     >
       <div className="max-w-4xl mx-auto space-y-8">
         {/* En-tête de section avec au maximum une pastille */}

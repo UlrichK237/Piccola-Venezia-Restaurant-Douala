@@ -13,22 +13,41 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
   onClose,
   selectedPlat,
 }) => {
-  const [type, setType] = useState<'reservation' | 'commande'>(selectedPlat ? 'commande' : 'reservation');
+  const lieu = RESTAURANT_DATA.lieux[0];
+  const whatsappRaw = lieu.whatsapp;
+  const whatsappDigits = (whatsappRaw || '').replace(/[^0-9]/g, '');
+
+  const canOrderTakeaway = RESTAURANT_DATA.restaurant.services.some(
+    service => service.toLowerCase().includes('emporter')
+  );
+
+  const getTodayDateString = () => {
+    const d = new Date();
+    const year = d.getFullYear();
+    const month = String(d.getMonth() + 1).padStart(2, '0');
+    const day = String(d.getDate()).padStart(2, '0');
+    return `${year}-${month}-${day}`;
+  };
+
+  const [type, setType] = useState<'reservation' | 'commande'>(
+    canOrderTakeaway && selectedPlat ? 'commande' : 'reservation'
+  );
   const [name, setName] = useState('');
   const [phone, setPhone] = useState('');
-  const [date, setDate] = useState('2026-11-09');
+  const [date, setDate] = useState<string>(getTodayDateString());
   const [time, setTime] = useState('20:00');
   const [guests, setGuests] = useState('2');
   const [platSelection, setPlatSelection] = useState<string>(selectedPlat ? selectedPlat.nom : '');
   const [notes, setNotes] = useState('');
   const [copied, setCopied] = useState(false);
 
-  if (!isOpen) return null;
+  // La fenêtre ReservationModal ne s'affiche que si lieux[0].whatsapp n'est pas null et contient des chiffres
+  if (!isOpen || !whatsappRaw || whatsappDigits.length === 0) return null;
 
-  const phoneDigits = RESTAURANT_DATA.lieux[0].telephone.replace(/[^0-9]/g, '');
+  const activeMode = canOrderTakeaway ? type : 'reservation';
 
   const buildWhatsAppMessage = () => {
-    if (type === 'reservation') {
+    if (activeMode === 'reservation') {
       return `Bonjour Piccola Venezia,\n\nJe souhaite réserver une table pour ${guests} personnes le ${date} à ${time}.\nNom: ${name || '[Mon Nom]'}\nTéléphone: ${phone || '[Mon Numéro]'}\n${notes ? `Remarques: ${notes}\n` : ''}\nMerci de me confirmer la disponibilité.`;
     } else {
       return `Bonjour Piccola Venezia,\n\nJe souhaite commander à emporter :\n- Plat: ${platSelection || 'Sélectionner sur la carte'}\nPour récupération le ${date} vers ${time}.\nNom: ${name || '[Mon Nom]'}\nTéléphone: ${phone || '[Mon Numéro]'}\n${notes ? `Précisions: ${notes}\n` : ''}\nMerci de me confirmer la commande et le total.`;
@@ -37,7 +56,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
 
   const handleSendWhatsApp = () => {
     const text = encodeURIComponent(buildWhatsAppMessage());
-    window.open(`https://wa.me/${phoneDigits}?text=${text}`, '_blank');
+    window.open(`https://wa.me/${whatsappDigits}?text=${text}`, '_blank');
   };
 
   const handleCopy = () => {
@@ -57,7 +76,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
             </span>
             <div>
               <h3 className="text-base font-serif font-bold text-[#2B1A12]">
-                {type === 'reservation' ? 'Réserver une table' : 'Commander à emporter'}
+                {activeMode === 'reservation' ? 'Réserver une table' : 'Commander à emporter'}
               </h3>
               <p className="text-xs text-[#6B5446]">
                 {RESTAURANT_DATA.restaurant.nom} • {RESTAURANT_DATA.lieux[0].quartier}
@@ -72,35 +91,37 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
           </button>
         </div>
 
-        {/* Toggle Mode */}
-        <div className="flex border-b border-[#EADFCF] p-2 bg-[#F0E6D8]/50 gap-2">
-          <button
-            onClick={() => setType('reservation')}
-            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
-              type === 'reservation'
-                ? 'bg-[#A84A15] text-white'
-                : 'text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8]'
-            }`}
-          >
-            <Users className="w-3.5 h-3.5" />
-            Réserver une table
-          </button>
-          <button
-            onClick={() => setType('commande')}
-            className={`flex-1 py-2 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
-              type === 'commande'
-                ? 'bg-[#A84A15] text-white'
-                : 'text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8]'
-            }`}
-          >
-            <Utensils className="w-3.5 h-3.5" />
-            Commander à emporter
-          </button>
-        </div>
+        {/* Toggle Mode (affiché uniquement si À emporter figure dans les services) */}
+        {canOrderTakeaway && (
+          <div className="flex border-b border-[#EADFCF] p-2 bg-[#F0E6D8]/50 gap-2">
+            <button
+              onClick={() => setType('reservation')}
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
+                type === 'reservation'
+                  ? 'bg-[#A84A15] text-white'
+                  : 'text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8]'
+              }`}
+            >
+              <Users className="w-3.5 h-3.5" />
+              Réserver une table
+            </button>
+            <button
+              onClick={() => setType('commande')}
+              className={`flex-1 py-2 text-xs font-semibold rounded-lg transition flex items-center justify-center gap-2 ${
+                type === 'commande'
+                  ? 'bg-[#A84A15] text-white'
+                  : 'text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8]'
+              }`}
+            >
+              <Utensils className="w-3.5 h-3.5" />
+              Commander à emporter
+            </button>
+          </div>
+        )}
 
         {/* Form fields */}
         <div className="p-5 space-y-4 max-h-[65vh] overflow-y-auto text-xs sm:text-sm">
-          {type === 'commande' && (
+          {activeMode === 'commande' && (
             <div>
               <label className="block text-xs font-medium text-[#6B5446] mb-1">
                 Plat sélectionné
@@ -154,7 +175,7 @@ export const ReservationModal: React.FC<ReservationModalProps> = ({
                 className="w-full px-3 py-2 rounded-lg bg-white border border-[#D9C8B4] text-[#2B1A12] text-xs focus:outline-none focus:border-[#A84A15]"
               />
             </div>
-            {type === 'reservation' ? (
+            {activeMode === 'reservation' ? (
               <div>
                 <label className="block text-xs font-medium text-[#6B5446] mb-1 flex items-center gap-1">
                   <Users className="w-3.5 h-3.5 text-[#A84A15]" /> Nombre de personnes

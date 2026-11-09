@@ -1,5 +1,5 @@
 import React from 'react';
-import { MapPin, Phone, Clock, Navigation } from 'lucide-react';
+import { MapPin, Phone, Clock, Navigation, Calendar } from 'lucide-react';
 import { RESTAURANT_DATA } from '../data/restaurantData';
 
 interface LocationSectionProps {
@@ -8,6 +8,8 @@ interface LocationSectionProps {
 
 export const LocationSection: React.FC<LocationSectionProps> = ({ onOpenReservation }) => {
   const lieu = RESTAURANT_DATA.lieux[0];
+  const whatsappDigits = (lieu.whatsapp || '').replace(/[^0-9]/g, '');
+  const hasWhatsapp = Boolean(lieu.whatsapp && whatsappDigits.length > 0);
 
   return (
     <>
@@ -15,7 +17,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ onOpenReservat
       <section
         id="infos"
         aria-label="Infos pratiques"
-        className="py-12 md:py-14 px-4 sm:px-6 bg-[#FBF6EE] text-[#2B1A12] border-t border-[#EADFCF]"
+        className="scroll-mt-16 py-12 md:py-14 px-4 sm:px-6 bg-[#FBF6EE] text-[#2B1A12] border-t border-[#EADFCF]"
       >
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="space-y-1">
@@ -59,7 +61,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ onOpenReservat
       <section
         id="contact"
         aria-label="Contact"
-        className="py-12 md:py-14 px-4 sm:px-6 bg-[#FBF6EE] text-[#2B1A12] border-t border-[#EADFCF]"
+        className="scroll-mt-16 py-12 md:py-14 px-4 sm:px-6 bg-[#FBF6EE] text-[#2B1A12] border-t border-[#EADFCF]"
       >
         <div className="max-w-4xl mx-auto space-y-6">
           <div className="space-y-1">
@@ -84,10 +86,10 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ onOpenReservat
             </a>
 
             {/* Boutons d'action concrets */}
-            <div className="flex flex-wrap items-center gap-3 pt-2">
+            <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-2">
               <a
                 href={`tel:${lieu.telephone}`}
-                className="px-5 py-2.5 rounded-lg bg-[#A84A15] hover:bg-[#8D3C0F] text-white text-xs font-semibold inline-flex items-center gap-2 transition"
+                className="px-4 sm:px-5 py-2.5 rounded-lg bg-[#A84A15] hover:bg-[#8D3C0F] text-white text-xs font-semibold inline-flex items-center gap-2 transition"
               >
                 <Phone className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>Appeler</span>
@@ -97,30 +99,22 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ onOpenReservat
                 href={lieu.maps_url}
                 target="_blank"
                 rel="noreferrer"
-                className="px-5 py-2.5 rounded-lg bg-[#F0E6D8] hover:bg-[#E5D7C4] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-2 transition border border-[#D9C8B4]"
+                className="px-4 sm:px-5 py-2.5 rounded-lg bg-[#F0E6D8] hover:bg-[#E5D7C4] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-2 transition border border-[#D9C8B4]"
               >
                 <Navigation className="w-3.5 h-3.5 text-[#A84A15]" aria-hidden="true" />
                 <span>Itinéraire</span>
               </a>
 
-              {/* Bouton WhatsApp uniquement si lieux[0].whatsapp n'est pas null */}
-              {lieu.whatsapp && (
-                <a
-                  href={`https://wa.me/${lieu.whatsapp.replace(/[^0-9]/g, '')}`}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="px-5 py-2.5 rounded-lg bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-2 transition"
+              {/* Bouton Commander / Réserver affiché uniquement si whatsapp n'est pas null et contient des chiffres */}
+              {hasWhatsapp && (
+                <button
+                  onClick={onOpenReservation}
+                  className="px-4 sm:px-5 py-2.5 rounded-lg bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-2 transition"
                 >
-                  <span>WhatsApp</span>
-                </a>
+                  <Calendar className="w-3.5 h-3.5 text-[#2B1A12]" aria-hidden="true" />
+                  <span>Commander / Réserver</span>
+                </button>
               )}
-
-              <button
-                onClick={onOpenReservation}
-                className="px-5 py-2.5 rounded-lg bg-transparent hover:bg-[#F0E6D8] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-2 transition"
-              >
-                <span>Commander / Réserver</span>
-              </button>
             </div>
           </div>
         </div>

@@ -47,7 +47,7 @@ export const RESTAURANT_DATA: RestaurantData = {
     accroche: null,
     description: null,
     cuisine: ["Italienne"],
-    logo_url: "/public/assets/logo_5b391c43.png",
+    logo_url: "/assets/logo_5b391c43.png",
     services: []
   },
   lieux: [
