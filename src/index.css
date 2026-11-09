@@ -1,0 +1,15 @@
+@import "tailwindcss";
+
+:root {
+  --fond: #FBF6EE;
+  --texte: #2B1A12;
+  --texte-2: #6B5446;
+  --marque: #EB7F36;
+  --marque-fonce: #A84A15;
+}
+
+body {
+  background-color: var(--fond);
+  color: var(--texte);
+  font-family: 'Plus Jakarta Sans', system-ui, -apple-system, sans-serif;
+}

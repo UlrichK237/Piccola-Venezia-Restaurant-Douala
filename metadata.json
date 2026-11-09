@@ -1,0 +1,6 @@
+{
+  "name": "Piccola Venezia Douala - Maquette & Données",
+  "description": "Maquette de site web interactif et explorateur de données pour le restaurant italien Piccola Venezia à Bonapriso, Douala.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
