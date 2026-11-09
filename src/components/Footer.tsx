@@ -15,7 +15,7 @@ export const Footer: React.FC = () => {
         <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
           <div className="flex items-center gap-3">
             <img
-              src="/public/assets/aistudio/logo_5b391c43.png"
+              src="/public/assets/logo_5b391c43.png"
               alt="L'italien Piccola Venezia"
               className="max-w-[200px] w-auto h-8 object-contain"
             />

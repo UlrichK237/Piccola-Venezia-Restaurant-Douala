@@ -29,7 +29,7 @@ export const AmbianceStrip: React.FC = () => {
     // Vérifie l'existence réelle du fichier vidéo avant d'afficher la bande
     fetch('/assets/videos/ambiance.mp4', { method: 'HEAD' })
       .then(res => {
-        if (res.ok) {
+        if (res.ok && (res.headers.get('content-type') || '').startsWith('video/')) {
           setIsAvailable(true);
         }
       })

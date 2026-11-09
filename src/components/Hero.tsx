@@ -119,7 +119,6 @@ export const Hero: React.FC = () => {
             isVideoLoaded ? 'opacity-100' : 'opacity-0'
           }`}
         >
-          <source src="/assets/videos/hero.webm" type="video/webm" />
           <source src="/assets/videos/hero.mp4" type="video/mp4" />
         </video>
       )}

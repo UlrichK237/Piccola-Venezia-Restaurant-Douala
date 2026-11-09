@@ -18,7 +18,7 @@ export const Navbar: React.FC = () => {
         {/* Dans l'en-tête, le logo suffit (max 200px) */}
         <a href="#hero" className="inline-block" aria-label="Accueil - L'italien Piccola Venezia">
           <img
-            src="/public/assets/aistudio/logo_5b391c43.png"
+            src="/public/assets/logo_5b391c43.png"
             alt="L'italien Piccola Venezia"
             className="max-w-[200px] w-auto h-9 object-contain"
           />
