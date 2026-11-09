@@ -7,56 +7,53 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 const rootDir = path.resolve(__dirname, '..');
 
-// 1. Vérification de la variable CONTACT_EMAIL
-const contactEmail = process.env.CONTACT_EMAIL;
-if (!contactEmail || !contactEmail.trim()) {
-  console.error('\x1b[31m%s\x1b[0m', "Erreur : La variable d'environnement CONTACT_EMAIL est manquante.");
-  console.error("Conformément aux règles d'utilisation de Wikimedia Commons, un User-Agent avec email de contact est obligatoire.");
-  console.error('Veuillez définir CONTACT_EMAIL dans votre fichier .env puis lancer le script avec :');
-  console.error('\x1b[36m%s\x1b[0m', '  node --env-file=.env scripts/fetch-photos.mjs\n');
-  process.exit(1);
-}
+// 1. User-Agent avec repli sur GitHub si CONTACT_EMAIL n'est pas défini
+const contact =
+  process.env.CONTACT_EMAIL && process.env.CONTACT_EMAIL.trim()
+    ? `mailto:${process.env.CONTACT_EMAIL.trim()}`
+    : 'https://github.com/UlrichK237/Piccola-Venezia-Restaurant-Douala';
 
-const userAgent = `PiccolaVeneziaDemo/1.0 (mailto:${contactEmail.trim()})`;
+const userAgent = `PiccolaVeneziaDemo/1.0 (${contact})`;
 
-// Analyse des arguments de la ligne de commande
+// Analyse des arguments
 const args = process.argv.slice(2);
 const isForce = args.includes('--force');
 const onlyIndex = args.indexOf('--only');
-const onlyDish = onlyIndex !== -1 && args[onlyIndex + 1] ? args[onlyIndex + 1].trim().toLowerCase() : null;
+const onlyArg = onlyIndex !== -1 && args[onlyIndex + 1] ? args[onlyIndex + 1].trim().toLowerCase() : null;
 
-// Chemins des fichiers
+// Chemins
 const queriesPath = path.join(rootDir, 'src', 'data', 'photoQueries.json');
 const platPhotosPath = path.join(rootDir, 'src', 'data', 'platPhotos.json');
 const photosDir = path.join(rootDir, 'public', 'photos', 'plats');
 const outDir = path.join(rootDir, 'scripts', 'out');
 const reviewHtmlPath = path.join(outDir, 'photos-review.html');
 
-// Création des dossiers nécessaires
 fs.mkdirSync(photosDir, { recursive: true });
 fs.mkdirSync(outDir, { recursive: true });
 
-// Lecture des requêtes
 if (!fs.existsSync(queriesPath)) {
   console.error(`Fichier introuvable : ${queriesPath}`);
   process.exit(1);
 }
 const photoQueries = JSON.parse(fs.readFileSync(queriesPath, 'utf-8'));
 
-// Chargement des photos déjà existantes
+// Chargement des photos existantes et mise à jour du champ niveau pour les entrées existantes
 let platPhotos = {};
 if (fs.existsSync(platPhotosPath)) {
   try {
     platPhotos = JSON.parse(fs.readFileSync(platPhotosPath, 'utf-8'));
+    for (const [key, item] of Object.entries(platPhotos)) {
+      if (!item.niveau && photoQueries[key]?.niveau) {
+        item.niveau = photoQueries[key].niveau;
+      }
+    }
   } catch (e) {
     platPhotos = {};
   }
 }
 
-// Fonction de pause (600 ms minimum pour Wikimedia)
 const sleep = ms => new Promise(resolve => setTimeout(resolve, ms));
 
-// Génération de slug URL / fichier
 function slugify(text) {
   return text
     .normalize('NFD')
@@ -66,13 +63,11 @@ function slugify(text) {
     .replace(/^-+|-+$/g, '');
 }
 
-// Nettoyage de balises HTML
 function stripHtml(html) {
   if (!html) return '';
   return html.replace(/<[^>]*>/g, '').replace(/\s+/g, ' ').trim();
 }
 
-// Vérification de la licence Wikimedia (CC0, Public domain, CC BY, CC BY-SA, sans NC ni ND)
 function isValidLicense(license) {
   if (!license) return false;
   const s = String(license).trim();
@@ -83,20 +78,25 @@ function isValidLicense(license) {
   return false;
 }
 
-// Validation d'un candidat Wikimedia
+// Mots interdits dans le titre du fichier (logo, façade, intérieur, etc.)
+const FORBIDDEN_TITLE_REGEX = /(logo|menu|facade|façade|interior|map|diagram|flag|painting|grainproducts|preparation_amatriciana|making_of|campagne_cosb|scallop_shell|scallop_specimen|kokkikartano|full_breakfast)/i;
+
 function isValidCandidate(info, page, motsCles) {
   if (info.mime !== 'image/jpeg') return false;
   if (!info.width || info.width < 800) return false;
   if (!info.thumburl) return false;
 
+  const title = page.title || '';
+  if (FORBIDDEN_TITLE_REGEX.test(title)) return false;
+
   const extmeta = info.extmetadata || {};
   const license = extmeta.LicenseShortName?.value || '';
   if (!isValidLicense(license)) return false;
 
-  const title = (page.title || '').toLowerCase();
+  const titleLower = title.toLowerCase();
   const desc = stripHtml(extmeta.ImageDescription?.value || '').toLowerCase();
   const objName = (extmeta.ObjectName?.value || '').toLowerCase();
-  const fullText = `${title} ${desc} ${objName}`;
+  const fullText = `${titleLower} ${desc} ${objName}`;
 
   const hasKeyword = motsCles.some(kw => fullText.includes(kw.toLowerCase()));
   if (!hasKeyword) return false;
@@ -104,7 +104,23 @@ function isValidCandidate(info, page, motsCles) {
   return true;
 }
 
-// Interrogation de l'API Wikimedia Commons
+// Requête fetch avec gestion des erreurs 429 et 503 (Retry-After)
+async function fetchWithRetry(url, options = {}, maxRetries = 3) {
+  for (let attempt = 0; attempt <= maxRetries; attempt++) {
+    const res = await fetch(url, options);
+    if (res.status === 429 || res.status === 503) {
+      if (attempt === maxRetries) return res;
+      const retryAfter = res.headers.get('Retry-After');
+      const waitSeconds = retryAfter ? parseInt(retryAfter, 10) || 5 : 5;
+      console.warn(`  [HTTP ${res.status}] Attente de ${waitSeconds}s avant réessai (${attempt + 1}/${maxRetries})...`);
+      await sleep(waitSeconds * 1000);
+      continue;
+    }
+    return res;
+  }
+  return fetch(url, options);
+}
+
 async function searchWikimedia(requete, motsCles) {
   const url = new URL('https://commons.wikimedia.org/w/api.php');
   url.searchParams.set('action', 'query');
@@ -117,7 +133,7 @@ async function searchWikimedia(requete, motsCles) {
   url.searchParams.set('iiurlwidth', '720');
   url.searchParams.set('format', 'json');
 
-  const res = await fetch(url.toString(), {
+  const res = await fetchWithRetry(url.toString(), {
     headers: {
       'User-Agent': userAgent,
     },
@@ -147,9 +163,8 @@ async function searchWikimedia(requete, motsCles) {
   return null;
 }
 
-// Téléchargement d'un fichier image
 async function downloadFile(url, destPath) {
-  const res = await fetch(url, {
+  const res = await fetchWithRetry(url, {
     headers: {
       'User-Agent': userAgent,
     },
@@ -161,12 +176,11 @@ async function downloadFile(url, destPath) {
   fs.writeFileSync(destPath, Buffer.from(arrayBuffer));
 }
 
-// Script principal
 async function main() {
   console.log('\x1b[32m%s\x1b[0m', '=== Script de téléchargement Wikimedia Commons - Piccola Venezia ===');
   console.log(`User-Agent : ${userAgent}`);
-  if (isForce) console.log('Option --force activée : les images existantes seront écrasées.');
-  if (onlyDish) console.log(`Option --only activée pour : "${onlyDish}"`);
+  if (isForce) console.log('Option --force activée : remplacement forcé.');
+  if (onlyArg) console.log(`Option --only activée pour : "${onlyArg}"`);
 
   let downloadedCount = 0;
   const missingPhotos = [];
@@ -176,14 +190,14 @@ async function main() {
   for (const [key, data] of entries) {
     const [categorie, nom] = key.split('::');
 
-    // Filtre --only
-    if (onlyDish && !nom.toLowerCase().includes(onlyDish) && !key.toLowerCase().includes(onlyDish)) {
-      continue;
-    }
-
-    // Ignorer les plats exclus
-    if (data.exclu) {
-      continue;
+    // Filtre --only : recherche dans nom, clé ou catégorie
+    if (onlyArg) {
+      const matchNom = nom.toLowerCase().includes(onlyArg);
+      const matchKey = key.toLowerCase().includes(onlyArg);
+      const matchCat = categorie.toLowerCase().includes(onlyArg);
+      if (!matchNom && !matchKey && !matchCat) {
+        continue;
+      }
     }
 
     const slug = slugify(nom);
@@ -191,18 +205,24 @@ async function main() {
     const destPath = path.join(photosDir, fileName);
     const publicUrl = `/photos/plats/${fileName}`;
 
-    // Si la photo existe déjà et pas de --force
+    // Si la photo existe déjà sur le disque et dans platPhotos.json et que --force n'est pas demandé
     if (fs.existsSync(destPath) && !isForce && platPhotos[key]) {
-      console.log(`[Déjà présent] ${nom} -> ${fileName}`);
+      // S'assurer que le champ niveau est bien renseigné
+      if (!platPhotos[key].niveau) {
+        platPhotos[key].niveau = data.niveau || 'exact';
+      }
+      console.log(`[Déjà présent] ${nom} (${platPhotos[key].niveau}) -> ${fileName}`);
       continue;
     }
 
-    console.log(`\nRecherche pour : \x1b[33m${nom}\x1b[0m (${categorie})`);
+    console.log(`\nRecherche pour : \x1b[33m${nom}\x1b[0m (${categorie}) [niveau: ${data.niveau}]`);
     let found = null;
     let successfulQuery = null;
+    let finalNiveau = data.niveau;
 
+    // 1. Essai des requêtes configurées
     for (const requete of data.requetes) {
-      await sleep(600); // 600 ms de pause entre chaque appel
+      await sleep(600);
       try {
         const candidate = await searchWikimedia(requete, data.mots_cles);
         if (candidate) {
@@ -211,10 +231,31 @@ async function main() {
           console.log(`  ✓ Trouvé avec requête : "${requete}" (${candidate.page.title})`);
           break;
         } else {
-          console.log(`  - Aucun résultat valable pour : "${requete}"`);
+          console.log(`  - Aucun résultat pour : "${requete}"`);
         }
       } catch (err) {
-        console.error(`  ✗ Erreur lors de la recherche ("${requete}") :`, err.message);
+        console.error(`  ✗ Erreur recherche ("${requete}") :`, err.message);
+      }
+    }
+
+    // 2. Si plat "exact" et rien trouvé : tentative de repli en "approchant"
+    if (!found && data.niveau === 'exact') {
+      const fallbackQuery = nom
+        .replace(/[/,]/g, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+      console.log(`  Tentative de repli en "approchant" avec : "${fallbackQuery}"...`);
+      await sleep(600);
+      try {
+        const candidate = await searchWikimedia(fallbackQuery, data.mots_cles);
+        if (candidate) {
+          found = candidate;
+          successfulQuery = fallbackQuery;
+          finalNiveau = 'approchant';
+          console.log(`  ✓ Trouvé en repli approchant : "${fallbackQuery}" (${candidate.page.title})`);
+        }
+      } catch (err) {
+        console.error(`  ✗ Erreur repli ("${fallbackQuery}") :`, err.message);
       }
     }
 
@@ -238,10 +279,11 @@ async function main() {
           licence_url: licenseUrl,
           source_url: sourceUrl,
           requete: successfulQuery,
+          niveau: finalNiveau,
         };
 
         downloadedCount++;
-        console.log(`  \x1b[32m✔ Enregistré dans ${fileName}\x1b[0m`);
+        console.log(`  \x1b[32m✔ Enregistré dans ${fileName} [${finalNiveau}]\x1b[0m`);
       } catch (err) {
         console.error(`  ✗ Échec téléchargement pour ${nom} :`, err.message);
         missingPhotos.push(`${key} (erreur téléchargement)`);
@@ -252,30 +294,28 @@ async function main() {
     }
   }
 
-  // Écriture du fichier platPhotos.json mis à jour
+  // Sauvegarde systématique de platPhotos.json
   fs.writeFileSync(platPhotosPath, JSON.stringify(platPhotos, null, 2) + '\n', 'utf-8');
   console.log(`\n\x1b[32m✔ Fichier mis à jour : ${platPhotosPath}\x1b[0m`);
 
-  // Génération de scripts/out/photos-review.html
+  // Génération de la page de revue
   generateReviewHtml(platPhotos, photoQueries);
 
   // Résumé
   console.log('\n========================================');
-  console.log(`Photos téléchargées / mises à jour : ${downloadedCount}`);
-  console.log(`Total des plats avec photo dans platPhotos.json : ${Object.keys(platPhotos).length}`);
+  console.log(`Nouvelles photos téléchargées : ${downloadedCount}`);
+  console.log(`Total des plats avec photo dans platPhotos.json : ${Object.keys(platPhotos).length} / ${entries.length}`);
   if (missingPhotos.length > 0) {
-    console.log(`Plats non exclus sans photo (${missingPhotos.length}) :`);
+    console.log(`Plats sans photo (${missingPhotos.length}) :`);
     missingPhotos.forEach(p => console.log(`  - ${p}`));
   } else {
-    console.log('Tous les plats éligibles ont une photo !');
+    console.log('\x1b[32m✔ Tous les 69 plats ont désormais une photo locale !\x1b[0m');
   }
-  console.log(`Page de revue générée : ${reviewHtmlPath}`);
+  console.log(`Page de revue disponible : ${reviewHtmlPath}`);
   console.log('========================================\n');
 }
 
-// Générateur de la page HTML de revue scripts/out/photos-review.html
 function generateReviewHtml(platPhotos, photoQueries) {
-  // Extraction des descriptions du menu depuis restaurantData.ts
   const restDataPath = path.join(rootDir, 'src', 'data', 'restaurantData.ts');
   const descriptions = {};
   if (fs.existsSync(restDataPath)) {
@@ -292,6 +332,10 @@ function generateReviewHtml(platPhotos, photoQueries) {
       const [categorie, nom] = key.split('::');
       const menuDesc = descriptions[nom] || '';
       const relPhotoPath = `../../public${item.fichier}`;
+      const niveauBadge =
+        item.niveau === 'approchant'
+          ? '<span class="badge-approchant">Approchant</span>'
+          : '<span class="badge-exact">Exact</span>';
 
       return `
       <div class="card" data-key="${escapeHtml(key)}">
@@ -301,6 +345,7 @@ function generateReviewHtml(platPhotos, photoQueries) {
         <div class="card-body">
           <div class="card-header">
             <span class="category-badge">${escapeHtml(categorie)}</span>
+            ${niveauBadge}
             <label class="keep-checkbox">
               <input type="checkbox" checked data-key="${escapeHtml(key)}" />
               <span>Garder</span>
@@ -407,6 +452,7 @@ function generateReviewHtml(platPhotos, photoQueries) {
       display: flex;
       justify-content: space-between;
       align-items: center;
+      gap: 8px;
     }
     .category-badge {
       font-size: 11px;
@@ -417,6 +463,22 @@ function generateReviewHtml(platPhotos, photoQueries) {
       border-radius: 999px;
       font-weight: 600;
     }
+    .badge-exact {
+      font-size: 10px;
+      background: #E8F5E9;
+      color: #2E7D32;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
+    .badge-approchant {
+      font-size: 10px;
+      background: #FFF3E0;
+      color: #E65100;
+      padding: 2px 6px;
+      border-radius: 4px;
+      font-weight: 600;
+    }
     .keep-checkbox {
       display: flex;
       align-items: center;
@@ -424,6 +486,7 @@ function generateReviewHtml(platPhotos, photoQueries) {
       font-size: 13px;
       font-weight: 600;
       cursor: pointer;
+      margin-left: auto;
     }
     .dish-title {
       font-size: 16px;

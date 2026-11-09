@@ -2,374 +2,415 @@
   "Antipasti::Bruschetta": {
     "requetes": ["Bruschetta al pomodoro", "Tomato basil bruschetta", "Bruschetta pomodoro"],
     "mots_cles": ["bruschetta", "pomodoro"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Antipasti::Salade Mixte": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Salade composée spécifique au restaurant (tomates, olives, feta, thon)"
+    "requetes": ["Insalata mista", "Mixed salad", "Insalata tonno", "Tuna salad tomatoes", "Insalata mista pomodori"],
+    "mots_cles": ["salad", "insalata"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Antipasti::Bruschetta Piccola": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Création du chef (toast chèvre, jambon de Parme et miel)"
+    "requetes": ["Bruschetta goat cheese ham honey", "Bruschetta prosciutto"],
+    "mots_cles": ["bruschetta"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Antipasti::Carpaccio de Boeuf": {
     "requetes": ["Carpaccio di manzo", "Beef carpaccio parmesan", "Carpaccio manzo rucola"],
     "mots_cles": ["carpaccio", "manzo"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Antipasti::Salade Poulet et Copeaux de Parmesan": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Salade composée spécifique avec poulet, pesto et copeaux de parmesan"
+    "requetes": ["Insalata di pollo", "Chicken salad", "Grilled chicken salad", "Insalata con pollo"],
+    "mots_cles": ["chicken", "pollo", "salad", "insalata"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Antipasti::Caprese": {
     "requetes": ["Insalata caprese", "Caprese salad", "Insalata Caprese pomodoro mozzarella"],
     "mots_cles": ["caprese", "insalata"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Antipasti::Carpaccio de Poisson": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Recette spécifique avec ananas mariné non standard"
+    "requetes": ["Fish carpaccio", "Carpaccio di pesce"],
+    "mots_cles": ["pesce", "fish", "salmon", "tuna", "tonno", "branzino"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Antipasti::Polenta et Gamberi / Calamars": {
     "requetes": ["Polenta e gamberi", "Polenta with shrimp"],
     "mots_cles": ["gamberi", "shrimp", "prawn", "calamari", "squid"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Antipasti::Tartare à l'Italienne": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Création maison spécifique de tartare au couteau avec tomates et basilic"
+    "requetes": ["Steak tartare", "Beef tartare", "Tartare di carne", "Tartare manzo", "Carne cruda"],
+    "mots_cles": ["tartare", "tartar", "steak", "manzo", "carne"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Antipasti::Pizza Fritta": {
     "requetes": ["Pizza fritta", "Montanara pizza fritta", "Fried pizza Naples"],
     "mots_cles": ["fritta", "fried", "montanara"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Antipasti::Noix de Saint Jacques Poelées et Pancetta": {
-    "requetes": ["Capesante pancetta", "Seared scallops pancetta"],
-    "mots_cles": ["scallop", "capesante"],
-    "exclu": false
+    "requetes": ["Bacon wrapped scallops", "Pan seared scallops", "Seared scallops bacon"],
+    "mots_cles": ["scallop", "scallops", "bacon"],
+    "exclu": false,
+    "niveau": "exact"
   },
   "Antipasti::Prosciutto di Parma": {
-    "requetes": ["Prosciutto di Parma", "Prosciutto crudo di Parma", "Parma ham platter"],
+    "requetes": ["Prosciutto crudo affettato", "Prosciutto di Parma plate", "Sliced prosciutto", "Prosciutto crudo di Parma"],
     "mots_cles": ["prosciutto", "parma"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Antipasti::Mozarella du Bufala": {
     "requetes": ["Mozzarella di bufala campana", "Mozzarella di bufala", "Buffalo mozzarella"],
     "mots_cles": ["mozzarella", "bufala"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Antipasti::Salade Italienne": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Salade composée maison (mozzarella, jambon de Parme, salade)"
+    "requetes": ["Prosciutto rocket bocconcini salad", "Parma Salad", "Prosciutto salad mozzarella"],
+    "mots_cles": ["prosciutto", "parma", "salad"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Antipasti::Affettato Misto": {
-    "requetes": ["Affettato misto", "Tagliere di salumi italiani", "Italian cold cuts platter"],
-    "mots_cles": ["affettato", "salumi"],
-    "exclu": false
+    "requetes": ["Tagliere di salumi", "Salumi misti", "Italian salumi", "Antipasto all'italiana", "Charcuterie board"],
+    "mots_cles": ["salumi", "affettato", "antipasto", "charcuterie", "prosciutto"],
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Penne Arrabiata": {
     "requetes": ["Penne all'arrabbiata", "Penne all'arrabbiata pasta", "Penne arrabbiata"],
     "mots_cles": ["arrabbiata", "penne"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Tagliatelle Bolognese": {
     "requetes": ["Tagliatelle al ragù", "Tagliatelle bolognese"],
     "mots_cles": ["ragù", "ragu", "bolognese"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Spaghetti Puttanesca": {
     "requetes": ["Spaghetti alla puttanesca", "Pasta alla puttanesca", "Puttanesca"],
     "mots_cles": ["puttanesca", "spaghetti"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Penne Pesto": {
     "requetes": ["Penne al pesto", "Penne pesto genovese", "Pasta al pesto"],
     "mots_cles": ["pesto", "penne"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Tortiglioni alla Norma": {
     "requetes": ["Pasta alla Norma", "Tortiglioni alla Norma", "Spaghetti alla Norma"],
     "mots_cles": ["norma", "melanzane"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Gnocchi Maison": {
     "requetes": ["Gnocchi di patate", "Potato gnocchi"],
     "mots_cles": ["gnocchi"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Spaghetti à la Sicilienne": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Création du chef, variante maison non documentée"
+    "requetes": ["Pasta alla Norma - Wiki Loves Sicilia", "Pasta con melanzane", "Pasta alla Norma"],
+    "mots_cles": ["norma", "pasta", "melanzane", "sicilia"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "I Classici Italiani::Linguine Amatriciana": {
-    "requetes": ["Spaghetti all'amatriciana", "Pasta all'amatriciana", "Bucatini all'amatriciana"],
-    "mots_cles": ["amatriciana", "pasta"],
-    "exclu": false
+    "requetes": ["Bucatini (amatriciana rossa)", "Bucatini amatriciana.JPG", "Bucatini allamatriciana", "Spaghetti all'amatriciana"],
+    "mots_cles": ["amatriciana", "bucatini", "pasta"],
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Rigatoni Cacio Pepe": {
-    "requetes": ["Rigatoni cacio e pepe", "Cacio e pepe", "Spaghetti cacio e pepe"],
+    "requetes": ["Spaghetti cacio e pepe (8602097091)", "Spaghetto cacio e pepe Roma", "Cacio e pepe pasta"],
     "mots_cles": ["cacio", "pepe"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Spaghetti Carbonara": {
     "requetes": ["Spaghetti alla carbonara", "Spaghetti carbonara"],
     "mots_cles": ["carbonara"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Farfalle Boscaiola": {
-    "requetes": ["Pasta alla boscaiola", "Farfalle alla boscaiola", "Boscaiola pasta"],
-    "mots_cles": ["boscaiola", "pasta"],
-    "exclu": false
+    "requetes": ["주식회사 엔아이에프앤씨 닐리 파스타 음식 사진2-Spaghetti ai funghi", "Pasta alla boscaiola", "Pasta ai funghi"],
+    "mots_cles": ["funghi", "pasta", "boscaiola"],
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Ravioli Ricotta Spinaci": {
-    "requetes": ["Ravioli ricotta e spinaci", "Ravioli ricotta spinaci", "Ricotta spinach ravioli"],
-    "mots_cles": ["ravioli", "ricotta"],
-    "exclu": false
+    "requetes": ["Liat Portal for Foodie Disorder - Ravioli with mushrooms and spinach in cream sauce", "Four cheese ravioli with cream sauce", "Ravioli 3.jpg"],
+    "mots_cles": ["ravioli"],
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Lasagne Bolognese / Boscaiola": {
     "requetes": ["Lasagne alla bolognese", "Lasagna bolognese"],
     "mots_cles": ["lasagna", "lasagne"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Ravioli aux Courgettes et Crevettes": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Farce spécifique courgettes et crevettes sans référence visuelle standard"
+    "requetes": ["Four cheese ravioli with cream sauce", "Ravioli 3.jpg", "Ravioli di Faraona"],
+    "mots_cles": ["ravioli"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "I Classici Italiani::Tagliatelle au Saumon": {
     "requetes": ["Tagliatelle al salmone", "Pasta al salmone", "Salmon tagliatelle"],
     "mots_cles": ["salmone", "tagliatelle"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "I Classici Italiani::Spaghetti Gambas, Lardon, Crème, Piment": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Création du chef terre-mer spécifique"
+    "requetes": ["Spaghetti gamberi", "Spaghetti with prawns"],
+    "mots_cles": ["gamberi", "prawn", "shrimp"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "I Classici Italiani::Bis di Pasta": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Plat à choix (deux variétés de pâtes au choix)"
+    "requetes": ["Spaghetti pomodoro", "Pasta dish"],
+    "mots_cles": ["pasta", "spaghetti"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "I Classici Italiani::Tris di Pasta": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Plat à choix (trois variétés de pâtes au choix)"
+    "requetes": ["Plate of Pasta (Unsplash)", "Pasta plate restaurant", "Pasta al Pomodoro 01"],
+    "mots_cles": ["pasta"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "I Classici Italiani::Tris del Giorno": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Plat à choix (trois variétés de pâtes du jour)"
+    "requetes": ["Tagliatelle all'amatriciana a un restaurant de Xàbia", "Two of Italian Pasta at Pasta noodle station in Conrad Hong Kong"],
+    "mots_cles": ["tagliatelle", "pasta", "amatriciana"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Carne::Ossobuco servi avec Tagliatelle": {
     "requetes": ["Ossobuco alla milanese", "Ossobuco con pasta", "Ossobuco"],
     "mots_cles": ["ossobuco", "veal"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Carne::Emincée de Porc": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Recette maison à la crème et au cognac non standardisée"
+    "requetes": ["Zürcher Geschnetzeltes mit Spätzle", "Zürcher Geschnetzeltes at Zur rote Buech", "Pork medallions cream sauce"],
+    "mots_cles": ["geschnetzeltes", "pork", "maiale"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Carne::Tagliata Grillé à l'Italienne": {
     "requetes": ["Tagliata di manzo con rucola", "Tagliata di manzo", "Beef tagliata arugula"],
     "mots_cles": ["tagliata", "manzo"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Carne::Cotoletta de Porc à la Milanaise": {
     "requetes": ["Cotoletta alla milanese", "Milanese cutlet", "Cotoletta panata"],
     "mots_cles": ["cotoletta", "milanese"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Carne::Saltinbocca": {
     "requetes": ["Saltimbocca alla romana", "Saltimbocca", "Veal saltimbocca"],
     "mots_cles": ["saltimbocca", "romana"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Carne::Escalope de Porc au Limone": {
     "requetes": ["Scaloppine al limone", "Scaloppina al limone", "Pork scallopini lemon"],
     "mots_cles": ["scaloppine", "limone"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Carne::Tagliata au Poivre du Pays": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Garniture locale spécifique (poivre du pays, haricots verts, bacon)"
+    "requetes": ["Steak au poivre - Italy", "Steak au poivre at Persilja", "Steak au poivre 2025"],
+    "mots_cles": ["steak", "poivre", "pepper"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Carne::Tagliata de Filet au Gorgonzola": {
-    "requetes": ["Tagliata al gorgonzola", "Beef tagliata gorgonzola sauce"],
-    "mots_cles": ["gorgonzola"],
-    "exclu": false
+    "requetes": ["Steak with gorgonzola sauce, slaw, and potatoes with sour cream - Wellington, New Zealand", "Grilled steak sandwich consisting of 6oz NY steak, gorgonzola"],
+    "mots_cles": ["gorgonzola", "steak"],
+    "exclu": false,
+    "niveau": "exact"
   },
   "Carne::Paupiette de Poulet au Jambon de Parme": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Création maison sur lit de tomates et vinaigre balsamique"
+    "requetes": ["Veal involtini-01", "Involtini", "Chicken roulade prosciutto"],
+    "mots_cles": ["involtini", "roulade", "chicken", "veal"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Pesce::Bar ou Capitaine Grillé": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Poisson local d'eau douce (Capitaine) et plat à option"
+    "requetes": ["Grilled sea bass (7906690230)", "Grilled sea bass", "Pesce alla griglia"],
+    "mots_cles": ["sea bass", "bass", "fish", "grilled"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Pesce::Capitaine al Cartoccio": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Poisson local camerounais (Capitaine / perche du Nil)"
+    "requetes": ["Orata al Cartoccio", "Pesce al cartoccio", "Fish en papillote"],
+    "mots_cles": ["cartoccio", "orata", "papillote"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Pesce::Bocconcini de Capitaine con Pancetta": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Création maison avec poisson local Capitaine"
+    "requetes": ["Piatto 1 - sagra del pesce Ognina 2025", "Involtini di pesce spada", "Fish rolls pancetta"],
+    "mots_cles": ["pesce", "fish", "involtini"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Pesce::Bar ou Capitaine au Poivre Vert": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Poisson local (Capitaine) et plat à option"
+    "requetes": ["Filetto di Pesce Persico al Limone", "Grilled Fish On The Bed Of Peas Mash And Caper Butter Sauce - Hyatt Hyderabad Gachibowli - Hyderabad 2023-04-29 8532", "Fish fillet pepper sauce"],
+    "mots_cles": ["pesce", "fish", "filetto"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Pesce::Gambas Sautées à l'Ail": {
-    "requetes": ["Garlic prawns", "Gamberi all'aglio", "Gambas al ajillo"],
-    "mots_cles": ["gamberi", "prawns"],
-    "exclu": false
+    "requetes": ["Grilled Garlic butter prawns with spicy prawn heads", "Garlic prawns", "Gamberi all'aglio"],
+    "mots_cles": ["prawns", "gamberi", "garlic"],
+    "exclu": false,
+    "niveau": "exact"
   },
   "Pesce::Brochettes de Gambas": {
-    "requetes": ["Spiedini di gamberi", "Shrimp skewers"],
-    "mots_cles": ["gamberi", "shrimp", "prawn", "spiedini", "skewer"],
-    "exclu": false
+    "requetes": ["Spiedini di gamberi & capesante (4233709928)", "Spiedini di gamberi", "Shrimp skewers"],
+    "mots_cles": ["spiedini", "gamberi", "shrimp", "skewer"],
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Margherita": {
     "requetes": ["Pizza Margherita", "Neapolitan pizza Margherita", "Pizza margherita"],
     "mots_cles": ["margherita", "pizza"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Manu": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Nom maison du restaurant"
+    "requetes": ["Pizza pomodoro basilico", "Pizza tomato basil"],
+    "mots_cles": ["pizza"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Le Pizze::Vegetarianna": {
     "requetes": ["Pizza vegetariana", "Vegetarian pizza", "Pizza verdure"],
     "mots_cles": ["vegetariana", "pizza"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Jambon Cuit": {
     "requetes": ["Pizza con prosciutto cotto", "Pizza prosciutto cotto", "Ham pizza"],
     "mots_cles": ["prosciutto", "pizza"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Saporita": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Nom maison et recette personnalisée (feta et ail)"
+    "requetes": ["Pizza with feta cheese", "Pizza feta garlic"],
+    "mots_cles": ["feta", "pizza"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Le Pizze::Napolitana": {
     "requetes": ["Pizza napoletana acciughe", "Pizza romana acciughe", "Pizza anchovies capers"],
     "mots_cles": ["acciughe", "pizza"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Prosciutto Funghi": {
     "requetes": ["Pizza prosciutto e funghi", "Pizza prosciutto funghi", "Ham mushroom pizza"],
     "mots_cles": ["funghi", "pizza"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Calzone": {
     "requetes": ["Calzone pizza", "Pizza calzone ripieno", "Calzone"],
     "mots_cles": ["calzone", "pizza"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Venezia": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Nom maison du restaurant"
+    "requetes": ["Pizza with roasted eggplant, marinara, spicy breadcrumbs, parmigiana, basil - San Francisco, CA", "Pizza parmigiana.jpg", "Una Parmigiana"],
+    "mots_cles": ["pizza", "parmigiana", "eggplant"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Le Pizze::Regina": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Composition maison avec œuf différant de la pizza reine/regina classique"
+    "requetes": ["Pizza regina", "Pizza regina funghi olive"],
+    "mots_cles": ["regina", "pizza"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Le Pizze::Diavola": {
-    "requetes": ["Pizza alla diavola", "Pizza diavola", "Pepperoni pizza diavola"],
+    "requetes": ["Pizza Diavola (Verde Ischia)", "Pizza Diavola at Alby's Pizza", "Pizza alla diavola"],
     "mots_cles": ["diavola", "pizza"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Vesuvio": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Composition atypique (merguez et chorizo) différant de la pizza italienne classique"
+    "requetes": ["Pizza vesuvio", "Pizza spicy sausage eggplant"],
+    "mots_cles": ["pizza"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Le Pizze::Padrino": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Nom maison du restaurant"
+    "requetes": ["Pizza carciofi prosciutto funghi", "Pizza ham mushrooms artichokes"],
+    "mots_cles": ["pizza"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Le Pizze::Cappriciosa": {
     "requetes": ["Pizza capricciosa", "Pizza alla capricciosa", "Capricciosa pizza"],
     "mots_cles": ["capricciosa", "pizza"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Quattro Formaggi": {
     "requetes": ["Pizza quattro formaggi", "Four cheese pizza"],
     "mots_cles": ["formaggi", "four cheese"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Paysanne": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Nom maison et recette personnalisée (oignons, saucisson, feta)"
+    "requetes": ["Pizza with onions and sausage", "Pizza onion sausage feta"],
+    "mots_cles": ["pizza"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Le Pizze::Don Elio": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Nom maison du restaurant"
+    "requetes": ["Pizza Tonno at Leonardo", "Pizza Tonno Cipolla", "Pizza tonno"],
+    "mots_cles": ["tonno", "pizza"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Le Pizze::Frutti di Mare": {
     "requetes": ["Pizza ai frutti di mare", "Seafood pizza", "Pizza frutti di mare"],
     "mots_cles": ["frutti di mare", "seafood"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   },
   "Le Pizze::Pizza PV": {
-    "requetes": [],
-    "mots_cles": [],
-    "exclu": true,
-    "raison": "Nom maison et recette signature spécifique du restaurant Piccola Venezia"
+    "requetes": ["Ortolana pizza - Nanninella", "Ortolana 26 - Nanninella 2024-10-04", "Pizza ortolana"],
+    "mots_cles": ["ortolana", "pizza"],
+    "exclu": false,
+    "niveau": "approchant"
   },
   "Le Pizze::Parma": {
     "requetes": ["Pizza con prosciutto di Parma", "Pizza crudo di Parma", "Prosciutto di Parma pizza"],
     "mots_cles": ["prosciutto", "parma"],
-    "exclu": false
+    "exclu": false,
+    "niveau": "exact"
   }
 }

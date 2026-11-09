@@ -15,6 +15,7 @@ export interface PlatPhotoInfo {
   licence_url: string;
   source_url: string;
   requete?: string;
+  niveau?: 'exact' | 'approchant';
 }
 
 interface PlatModalProps {
@@ -157,7 +158,11 @@ export const PlatModal: React.FC<PlatModalProps> = ({
         {/* Mentions sous la photo (visible sans défilement sur ordinateur) */}
         {!imgError && photoInfo?.fichier && (
           <div className="px-4 py-2.5 bg-[#F0E6D8]/60 border-b border-[#EADFCF] text-[11px] text-[#6B5446] space-y-0.5 leading-snug">
-            <p>Photo d'illustration, qui peut différer du plat servi.</p>
+            <p>
+              {photoInfo.niveau === 'approchant'
+                ? "Photo d'illustration approchante : elle ne représente pas exactement ce plat."
+                : "Photo d'illustration, qui peut différer du plat servi."}
+            </p>
             <p className="truncate">
               Photo : {photoInfo.auteur},{' '}
               {photoInfo.licence_url ? (

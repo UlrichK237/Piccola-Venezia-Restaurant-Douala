@@ -29,38 +29,29 @@ if (fs.existsSync(platPhotosPath)) {
 }
 
 const totalEntries = Object.keys(photoQueries).length;
-const aPhotographier = [];
-const exclus = [];
-
-for (const [key, val] of Object.entries(photoQueries)) {
-  if (val.exclu) {
-    exclus.push(key);
-  } else {
-    aPhotographier.push(key);
-  }
-}
+const exactCount = Object.values(photoQueries).filter(x => x.niveau === 'exact').length;
+const approchantCount = Object.values(photoQueries).filter(x => x.niveau === 'approchant').length;
 
 const photosPresentes = Object.keys(platPhotos);
-const sansPhoto = aPhotographier.filter(key => !platPhotos[key]);
+const sansPhoto = Object.keys(photoQueries).filter(key => !platPhotos[key]);
 
-console.log('=== Vérification des photos de plats ===\n');
-console.log(`Nombre total d'entrées dans photoQueries.json : ${totalEntries}`);
-console.log(`Nombre de plats à photographier               : ${aPhotographier.length}`);
-console.log(`Nombre de plats exclus                          : ${exclus.length}`);
-console.log(`Nombre de photos présentes dans platPhotos.json : ${photosPresentes.length}\n`);
+console.log('=== Vérification des photos du menu ===\n');
+console.log(`Total d'entrées dans photoQueries.json : ${totalEntries} (attendu : 69)`);
+console.log(`Nombre de plats "exact"               : ${exactCount} (attendu : 41)`);
+console.log(`Nombre de plats "approchant"          : ${approchantCount} (attendu : 28)`);
+console.log(`Nombre de photos présentes            : ${photosPresentes.length} / ${totalEntries}\n`);
 
 if (sansPhoto.length > 0) {
-  console.log(`Plats à photographier en attente de photo (${sansPhoto.length}) :`);
-  sansPhoto.forEach(k => console.log(`  - ${k}`));
+  console.log(`Plats sans photo (${sansPhoto.length}) :`);
+  sansPhoto.forEach(k => console.log(`  - [${photoQueries[k]?.niveau || 'inconnu'}] ${k}`));
   console.log();
 } else {
-  console.log("Tous les plats à photographier disposent d'une photo.\n");
+  console.log('✔ Tous les 69 plats disposent d\'une photo locale.\n');
 }
 
 // Vérification des erreurs
 const erreurs = {
   platInexistant: [],
-  platExclu: [],
   fichierAbsent: [],
   cheminHttp: [],
   metadonneesVides: []
@@ -70,25 +61,22 @@ for (const [key, item] of Object.entries(platPhotos)) {
   // 1. Photo dont le plat n'existe pas dans photoQueries.json
   if (!photoQueries[key]) {
     erreurs.platInexistant.push(key);
-  } else if (photoQueries[key].exclu) {
-    // 2. Photo associée à un plat exclu
-    erreurs.platExclu.push(key);
   }
 
-  // 3. Chemin d'image commençant par http ou https
+  // 2. Chemin d'image commençant par http ou https
   const fichier = item.fichier || '';
   if (/^https?:\/\//i.test(fichier)) {
     erreurs.cheminHttp.push(`${key} -> ${fichier}`);
   } else {
-    // 4. Fichier image absent de public/
+    // 3. Fichier image absent de public/
     const relPath = fichier.startsWith('/') ? fichier.slice(1) : fichier;
     const fullDiskPath = path.join(publicDir, relPath);
     if (!fs.existsSync(fullDiskPath)) {
-      erreurs.fichierAbsent.push(`${key} -> ${fichier} (attendu dans ${path.relative(rootDir, fullDiskPath)})`);
+      erreurs.fichierAbsent.push(`${key} -> ${fichier} (introuvable dans ${path.relative(rootDir, fullDiskPath)})`);
     }
   }
 
-  // 5. Entrée dont auteur, licence ou source_url est vide
+  // 4. Entrée sans auteur, licence ou source_url
   const auteur = (item.auteur || '').trim();
   const licence = (item.licence || '').trim();
   const sourceUrl = (item.source_url || '').trim();
@@ -103,7 +91,6 @@ for (const [key, item] of Object.entries(platPhotos)) {
 
 const totalErreurs =
   erreurs.platInexistant.length +
-  erreurs.platExclu.length +
   erreurs.fichierAbsent.length +
   erreurs.cheminHttp.length +
   erreurs.metadonneesVides.length;
@@ -112,12 +99,8 @@ if (totalErreurs > 0) {
   console.error('\x1b[31m%s\x1b[0m', `ERREURS DÉTECTÉES (${totalErreurs}) :`);
 
   if (erreurs.platInexistant.length > 0) {
-    console.error('\nPlats dans platPhotos.json inexistants dans photoQueries.json :');
+    console.error('\nPlats dans platPhotos.json absents de photoQueries.json :');
     erreurs.platInexistant.forEach(e => console.error(`  - ${e}`));
-  }
-  if (erreurs.platExclu.length > 0) {
-    console.error('\nPhotos associées à un plat exclu :');
-    erreurs.platExclu.forEach(e => console.error(`  - ${e}`));
   }
   if (erreurs.cheminHttp.length > 0) {
     console.error("\nChemins d'image non locaux (http/https interdits) :");

@@ -5,6 +5,619 @@
     "licence": "CC BY-SA 4.0",
     "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
     "source_url": "https://commons.wikimedia.org/wiki/File:2014_Bruschetta_The_Larder_Chiang_Mai.jpg",
-    "requete": "Tomato basil bruschetta"
+    "requete": "Tomato basil bruschetta",
+    "niveau": "exact"
+  },
+  "Antipasti::Bruschetta Piccola": {
+    "fichier": "/photos/plats/bruschetta-piccola.jpg",
+    "auteur": "https://www.flickr.com/photos/arizonatravel/",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Raven_Cafe_Prosciutto_%26_Fig_Bruschetta.jpg",
+    "requete": "Bruschetta prosciutto",
+    "niveau": "approchant"
+  },
+  "Antipasti::Carpaccio de Boeuf": {
+    "fichier": "/photos/plats/carpaccio-de-boeuf.jpg",
+    "auteur": "Loveinsoradise",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Carpaccio_di_manzo.jpg",
+    "requete": "Carpaccio di manzo",
+    "niveau": "exact"
+  },
+  "Antipasti::Caprese": {
+    "fichier": "/photos/plats/caprese.jpg",
+    "auteur": "Rainer Zenz",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Caprese-1.jpg",
+    "requete": "Insalata caprese",
+    "niveau": "exact"
+  },
+  "Antipasti::Carpaccio de Poisson": {
+    "fichier": "/photos/plats/carpaccio-de-poisson.jpg",
+    "auteur": "Rod Waddington from Kergunyah, Australia",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Carpaccio_of_Kingfish_(7276563542).jpg",
+    "requete": "Fish carpaccio",
+    "niveau": "approchant"
+  },
+  "Antipasti::Polenta et Gamberi / Calamars": {
+    "fichier": "/photos/plats/polenta-et-gamberi-calamars.jpg",
+    "auteur": "Jon Sullivan",
+    "licence": "Public domain",
+    "licence_url": "",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Shrimp_with_polenta_and_spinich.jpg",
+    "requete": "Polenta with shrimp",
+    "niveau": "exact"
+  },
+  "Antipasti::Pizza Fritta": {
+    "fichier": "/photos/plats/pizza-fritta.jpg",
+    "auteur": "User:Stx",
+    "licence": "Public domain",
+    "licence_url": "",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Deep_Fried_Pizza.jpg",
+    "requete": "Pizza fritta",
+    "niveau": "exact"
+  },
+  "Antipasti::Prosciutto di Parma": {
+    "fichier": "/photos/plats/prosciutto-di-parma.jpg",
+    "auteur": "Scott Brenner",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Prosciutto_di_Parma_-_marchio_a_fuoco.jpg",
+    "requete": "Prosciutto di Parma",
+    "niveau": "exact"
+  },
+  "Antipasti::Mozarella du Bufala": {
+    "fichier": "/photos/plats/mozarella-du-bufala.jpg",
+    "auteur": "Punch Pizza",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Buffalo_Mozzarella.jpg",
+    "requete": "Mozzarella di bufala campana",
+    "niveau": "exact"
+  },
+  "Antipasti::Salade Mixte": {
+    "fichier": "/photos/plats/salade-mixte.jpg",
+    "auteur": "Thomas Wenger from near Bern, Switzerland",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Insalata_mista.jpg",
+    "requete": "Insalata mista",
+    "niveau": "approchant"
+  },
+  "Antipasti::Salade Poulet et Copeaux de Parmesan": {
+    "fichier": "/photos/plats/salade-poulet-et-copeaux-de-parmesan.jpg",
+    "auteur": "sakura",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Flickr_sa_ku_ra_10556400--Chicken_salad.jpg",
+    "requete": "Insalata di pollo",
+    "niveau": "approchant"
+  },
+  "Antipasti::Tartare à l'Italienne": {
+    "fichier": "/photos/plats/tartare-a-l-italienne.jpg",
+    "auteur": "Arnaud 25",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Steak_tartare_003.JPG",
+    "requete": "Steak tartare",
+    "niveau": "approchant"
+  },
+  "Antipasti::Noix de Saint Jacques Poelées et Pancetta": {
+    "fichier": "/photos/plats/noix-de-saint-jacques-poelees-et-pancetta.jpg",
+    "auteur": "Andrea",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Bacon_wrapped_scallops.jpg",
+    "requete": "Bacon wrapped scallops",
+    "niveau": "exact"
+  },
+  "Antipasti::Salade Italienne": {
+    "fichier": "/photos/plats/salade-italienne.jpg",
+    "auteur": "Chris Olszewski",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Prosciutto,_mango,_rocket_,_bocconcini_salad,_Sydney,_2026.jpg",
+    "requete": "Prosciutto rocket bocconcini salad",
+    "niveau": "approchant"
+  },
+  "Antipasti::Affettato Misto": {
+    "fichier": "/photos/plats/affettato-misto.jpg",
+    "auteur": "Albarubescens",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Tagliere_toscano.jpg",
+    "requete": "Tagliere di salumi",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Penne Arrabiata": {
+    "fichier": "/photos/plats/penne-arrabiata.jpg",
+    "auteur": "DC",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Penne_all%27arrabbiata.jpg",
+    "requete": "Penne all'arrabbiata",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Tagliatelle Bolognese": {
+    "fichier": "/photos/plats/tagliatelle-bolognese.jpg",
+    "auteur": "Ivan Vighetto",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Tagliatelle_al_rag%C3%B9_(image_modified).jpg",
+    "requete": "Tagliatelle al ragù",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Spaghetti Puttanesca": {
+    "fichier": "/photos/plats/spaghetti-puttanesca.jpg",
+    "auteur": "LoopZilla",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Spaghetti_puttanesca_by_LoopZilla.jpg",
+    "requete": "Spaghetti alla puttanesca",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Penne Pesto": {
+    "fichier": "/photos/plats/penne-pesto.jpg",
+    "auteur": "slgckgc",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pasta_al_Pesto_in_Florence,_Italy_(47909905101).jpg",
+    "requete": "Pasta al pesto",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Tortiglioni alla Norma": {
+    "fichier": "/photos/plats/tortiglioni-alla-norma.jpg",
+    "auteur": "Paoletta S.",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pasta_alla_Norma_(2563876877).jpg",
+    "requete": "Pasta alla Norma",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Gnocchi Maison": {
+    "fichier": "/photos/plats/gnocchi-maison.jpg",
+    "auteur": "Fabio Ingrosso from Italy",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Gnocchi_di_patate_con_rucola_e_Lard_dArnad.jpg",
+    "requete": "Gnocchi di patate",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Linguine Amatriciana": {
+    "fichier": "/photos/plats/linguine-amatriciana.jpg",
+    "auteur": "stu_spivack",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Bucatini_(amatriciana_rossa).jpg",
+    "requete": "Bucatini (amatriciana rossa)",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Rigatoni Cacio Pepe": {
+    "fichier": "/photos/plats/rigatoni-cacio-pepe.jpg",
+    "auteur": "Luca Nebuloni from Milan, Italy",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Spaghetti_cacio_e_pepe_(8602097091).jpg",
+    "requete": "Spaghetti cacio e pepe (8602097091)",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Spaghetti Carbonara": {
+    "fichier": "/photos/plats/spaghetti-carbonara.jpg",
+    "auteur": "Mattes Boch (Mboch on English Wikipedia)",
+    "licence": "Public domain",
+    "licence_url": "",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Spaghetti_alla_Carbonara.jpg",
+    "requete": "Spaghetti alla carbonara",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Ravioli Ricotta Spinaci": {
+    "fichier": "/photos/plats/ravioli-ricotta-spinaci.jpg",
+    "auteur": "HaJunkiyada",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Ravioli_with_mushrooms_and_spinach_in_cream_sauce.jpg",
+    "requete": "Liat Portal for Foodie Disorder - Ravioli with mushrooms and spinach in cream sauce",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Lasagne Bolognese / Boscaiola": {
+    "fichier": "/photos/plats/lasagne-bolognese-boscaiola.jpg",
+    "auteur": "Sambawamba",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Lasagna_bolognese.jpg",
+    "requete": "Lasagne alla bolognese",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Tagliatelle au Saumon": {
+    "fichier": "/photos/plats/tagliatelle-au-saumon.jpg",
+    "auteur": "Andy Li",
+    "licence": "CC0",
+    "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Tagliatelle_Al_Salmone_-_Pinocchio_2024-06-18.jpg",
+    "requete": "Tagliatelle al salmone",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Spaghetti Gambas, Lardon, Crème, Piment": {
+    "fichier": "/photos/plats/spaghetti-gambas-lardon-creme-piment.jpg",
+    "auteur": "Luca Nebuloni",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Spaghetti_with_agretti_and_shrimps_(33072545290).jpg",
+    "requete": "Spaghetti gamberi",
+    "niveau": "approchant"
+  },
+  "I Classici Italiani::Bis di Pasta": {
+    "fichier": "/photos/plats/bis-di-pasta.jpg",
+    "auteur": "Alessio Sbarbaro User_talk:Yoggysot",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pasta_al_Pomodoro_01.jpg",
+    "requete": "Spaghetti pomodoro",
+    "niveau": "approchant"
+  },
+  "I Classici Italiani::Tris di Pasta": {
+    "fichier": "/photos/plats/tris-di-pasta.jpg",
+    "auteur": "Eaters Collective eaterscollective",
+    "licence": "CC0",
+    "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Plate_of_Pasta_(Unsplash).jpg",
+    "requete": "Plate of Pasta (Unsplash)",
+    "niveau": "approchant"
+  },
+  "I Classici Italiani::Tris del Giorno": {
+    "fichier": "/photos/plats/tris-del-giorno.jpg",
+    "auteur": "Joanbanjo",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Tagliatelle_all%27amatriciana_a_un_restaurant_de_X%C3%A0bia.jpg",
+    "requete": "Tagliatelle all'amatriciana a un restaurant de Xàbia",
+    "niveau": "approchant"
+  },
+  "I Classici Italiani::Spaghetti à la Sicilienne": {
+    "fichier": "/photos/plats/spaghetti-a-la-sicilienne.jpg",
+    "auteur": "8w9d",
+    "licence": "CC0",
+    "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pasta_alla_Norma_-_Wiki_Loves_Sicilia.jpg",
+    "requete": "Pasta alla Norma - Wiki Loves Sicilia",
+    "niveau": "approchant"
+  },
+  "I Classici Italiani::Farfalle Boscaiola": {
+    "fichier": "/photos/plats/farfalle-boscaiola.jpg",
+    "auteur": "최광모",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:%EC%A3%BC%EC%8B%9D%ED%9A%8C%EC%82%AC_%EC%97%94%EC%95%84%EC%9D%B4%EC%97%90%ED%94%84%EC%95%A4%EC%94%A8_%EB%8B%90%EB%A6%AC_%ED%8C%8C%EC%8A%A4%ED%83%80_%EC%9D%8C%EC%8B%9D_%EC%82%AC%EC%A7%842-Spaghetti_ai_funghi.jpg",
+    "requete": "주식회사 엔아이에프앤씨 닐리 파스타 음식 사진2-Spaghetti ai funghi",
+    "niveau": "exact"
+  },
+  "I Classici Italiani::Ravioli aux Courgettes et Crevettes": {
+    "fichier": "/photos/plats/ravioli-aux-courgettes-et-crevettes.jpg",
+    "auteur": "HaJunkiyada",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Liat_Portal_for_Foodie_Disorder_-_Four_cheese_ravioli_with_cream_sauce.jpg",
+    "requete": "Four cheese ravioli with cream sauce",
+    "niveau": "approchant"
+  },
+  "Carne::Ossobuco servi avec Tagliatelle": {
+    "fichier": "/photos/plats/ossobuco-servi-avec-tagliatelle.jpg",
+    "auteur": "Mogens Engelund",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Ossobuco.jpg",
+    "requete": "Ossobuco alla milanese",
+    "niveau": "exact"
+  },
+  "Carne::Emincée de Porc": {
+    "fichier": "/photos/plats/emincee-de-porc.jpg",
+    "auteur": "Christian Michelides",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Z%C3%BCrcher_Geschnetzeltes_mit_Sp%C3%A4tzle.jpg",
+    "requete": "Zürcher Geschnetzeltes mit Spätzle",
+    "niveau": "approchant"
+  },
+  "Carne::Tagliata Grillé à l'Italienne": {
+    "fichier": "/photos/plats/tagliata-grille-a-l-italienne.jpg",
+    "auteur": "Stefano Maltauro",
+    "licence": "CC BY 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Tagliata_di_controfiletto.jpg",
+    "requete": "Tagliata di manzo",
+    "niveau": "exact"
+  },
+  "Carne::Cotoletta de Porc à la Milanaise": {
+    "fichier": "/photos/plats/cotoletta-de-porc-a-la-milanaise.jpg",
+    "auteur": "pier",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Cotoletta_alla_milanese.jpg",
+    "requete": "Cotoletta alla milanese",
+    "niveau": "exact"
+  },
+  "Carne::Saltinbocca": {
+    "fichier": "/photos/plats/saltinbocca.jpg",
+    "auteur": "Joachim Pietzowski",
+    "licence": "Public domain",
+    "licence_url": "",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Saltimbocca-2.jpg",
+    "requete": "Saltimbocca alla romana",
+    "niveau": "exact"
+  },
+  "Carne::Escalope de Porc au Limone": {
+    "fichier": "/photos/plats/escalope-de-porc-au-limone.jpg",
+    "auteur": "Xocolatl (talk) 15:26, 4 May 2014 (UTC)",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Scaloppine_al_limone.jpg",
+    "requete": "Scaloppine al limone",
+    "niveau": "exact"
+  },
+  "Carne::Tagliata au Poivre du Pays": {
+    "fichier": "/photos/plats/tagliata-au-poivre-du-pays.jpg",
+    "auteur": "E4024",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Steak_au_poivre_-_Italy.jpg",
+    "requete": "Steak au poivre - Italy",
+    "niveau": "approchant"
+  },
+  "Carne::Tagliata de Filet au Gorgonzola": {
+    "fichier": "/photos/plats/tagliata-de-filet-au-gorgonzola.jpg",
+    "auteur": "Daderot",
+    "licence": "CC0",
+    "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Steak_with_gorgonzola_sauce,_slaw,_and_potatoes_with_sour_cream_-_Wellington,_New_Zealand.jpg",
+    "requete": "Steak with gorgonzola sauce, slaw, and potatoes with sour cream - Wellington, New Zealand",
+    "niveau": "exact"
+  },
+  "Carne::Paupiette de Poulet au Jambon de Parme": {
+    "fichier": "/photos/plats/paupiette-de-poulet-au-jambon-de-parme.jpg",
+    "auteur": "angusf",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Veal_involtini-01.jpg",
+    "requete": "Veal involtini-01",
+    "niveau": "approchant"
+  },
+  "Pesce::Bar ou Capitaine Grillé": {
+    "fichier": "/photos/plats/bar-ou-capitaine-grille.jpg",
+    "auteur": "pelican from Tokyo, Japan",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Grilled_sea_bass_(7906690230).jpg",
+    "requete": "Grilled sea bass (7906690230)",
+    "niveau": "approchant"
+  },
+  "Pesce::Capitaine al Cartoccio": {
+    "fichier": "/photos/plats/capitaine-al-cartoccio.jpg",
+    "auteur": "Blue Lotus. from Tokio",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Orata_al_Cartoccio.jpg",
+    "requete": "Orata al Cartoccio",
+    "niveau": "approchant"
+  },
+  "Pesce::Bocconcini de Capitaine con Pancetta": {
+    "fichier": "/photos/plats/bocconcini-de-capitaine-con-pancetta.jpg",
+    "auteur": "Auregann",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Piatto_1_-_sagra_del_pesce_Ognina_2025.jpg",
+    "requete": "Piatto 1 - sagra del pesce Ognina 2025",
+    "niveau": "approchant"
+  },
+  "Pesce::Bar ou Capitaine au Poivre Vert": {
+    "fichier": "/photos/plats/bar-ou-capitaine-au-poivre-vert.jpg",
+    "auteur": "DinaBenedettoFerrandina",
+    "licence": "CC0",
+    "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Filetto_di_Pesce_Persico_al_Limone.jpg",
+    "requete": "Filetto di Pesce Persico al Limone",
+    "niveau": "approchant"
+  },
+  "Pesce::Gambas Sautées à l'Ail": {
+    "fichier": "/photos/plats/gambas-sautees-a-l-ail.jpg",
+    "auteur": "Dixitkedar",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Grilled_Garlic_butter_prawns_with_spicy_prawn_heads.jpg",
+    "requete": "Grilled Garlic butter prawns with spicy prawn heads",
+    "niveau": "exact"
+  },
+  "Pesce::Brochettes de Gambas": {
+    "fichier": "/photos/plats/brochettes-de-gambas.jpg",
+    "auteur": "fugzu from Pistoia, Italia",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Spiedini_di_gamberi_%26_capesante_(4233709928).jpg",
+    "requete": "Spiedini di gamberi & capesante (4233709928)",
+    "niveau": "exact"
+  },
+  "Le Pizze::Margherita": {
+    "fichier": "/photos/plats/margherita.jpg",
+    "auteur": "Valerio Capello at English Wikipedia",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "http://creativecommons.org/licenses/by-sa/3.0/",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Eq_it-na_pizza-margherita_sep2005_sml.jpg",
+    "requete": "Pizza Margherita",
+    "niveau": "exact"
+  },
+  "Le Pizze::Manu": {
+    "fichier": "/photos/plats/manu.jpg",
+    "auteur": "Andy Li",
+    "licence": "CC0",
+    "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Deluxe_all_in_pizza_-_Pomodoro_E_Basilico_at_Brighton_Open_Market%27s_Vegan_Market_event.jpg",
+    "requete": "Pizza pomodoro basilico",
+    "niveau": "approchant"
+  },
+  "Le Pizze::Vegetarianna": {
+    "fichier": "/photos/plats/vegetarianna.jpg",
+    "auteur": "Roberta F.",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza-vegetariana-riga-01.08.08.jpg",
+    "requete": "Pizza vegetariana",
+    "niveau": "exact"
+  },
+  "Le Pizze::Jambon Cuit": {
+    "fichier": "/photos/plats/jambon-cuit.jpg",
+    "auteur": "Takeaway",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:2014_Pizza_con_funghi_e_prosciutto_cotto_e_mozzarella_di_bufala.jpg",
+    "requete": "Pizza con prosciutto cotto",
+    "niveau": "exact"
+  },
+  "Le Pizze::Saporita": {
+    "fichier": "/photos/plats/saporita.jpg",
+    "auteur": "Kelly from Parsons, Kansas",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_(28).jpg",
+    "requete": "Pizza with feta cheese",
+    "niveau": "approchant"
+  },
+  "Le Pizze::Napolitana": {
+    "fichier": "/photos/plats/napolitana.jpg",
+    "auteur": "cyclonebill",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Flickr_-_cyclonebill_-_Pizza_med_ansjoser_og_kapers.jpg",
+    "requete": "Pizza anchovies capers",
+    "niveau": "exact"
+  },
+  "Le Pizze::Prosciutto Funghi": {
+    "fichier": "/photos/plats/prosciutto-funghi.jpg",
+    "auteur": "© Ra Boe / Wikipedia Create the proper attribution for your usage by clicking on this button! This file is licensed under the Creative Commons Attribution-Share Alike 3.0 Germany license.Attribution: Ra Boe / Wikipedia You are free: to share – to copy, distribute and transmit the work to remix – to adapt the work Under the following conditions: attribution – You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use. share alike – If you remix, transform, or build upon the material, you must distribute your contributions under the same or compatible license as the original.https://creativecommons.org/licenses/by-sa/3.0/de/deed.enCC BY-SA 3.0 deCreative Commons Attribution-Share Alike 3.0 detruetrue Internet: Titel Foto: Ra Boe / Wikipedia, Original; Lizenz: CC by-sa 3.0 Print: Titel Foto: Ra Boe / Wikipedia, Lizenz: CC by-sa 3.0 I have published this image as author Ra Boe under the \"CC-BY-SA-3.0\" in Wikipedia. This means that free, commercial usage outside of Wikipedia is permitted under the following licence terms: Online media: The author \" RaBoe/Wikipedia \" is named A weblink to the original image is provided: //commons.wikimedia.org/wiki/File:Pizza_prosciutto_e_funghi_(2010)_by_RaBoe.jpg A copy of, or the Uniform Resource Identifier (https://creativecommons.org/licenses/by-sa/3.0/de/legalcode) for, this License with every copy Print media: The author \" RaBoe/Wikipedia\" is named A copy of, or the Uniform Resource Identifier (https://creativecommons.org/licenses/by-sa/3.0/de/legalcode) for, this License with every copy Please send me a specimen copy or the URL of the website where the image is used. Please write an email to raboe001-at-web.de, if you need the image in a higher resolution need my postal address for sending a specimen copy have further questions about the terms of the licence PS: In case of refusal of the above terms the author reserves the right to take legal action. This license and the rights granted hereunder will terminate automatically upon any breach by you of the terms of this license. In this case the author reserves to demand declaration to cease and desist, and compensation (according to the MFM fee references currently in force). Any of the above conditions can be waived if you get permission from the copyright holder. Foto selbst aufgenommen mit Nikon-D50: Objektiv Tamron 18 - 250 mmvon Wikipedia-User: Ra Boe This photo was taken with an Nikon-D50:, Objective Tamron 18 - 250 mm by Wikipedia user: Ra Boe",
+    "licence": "CC BY-SA 3.0 de",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_prosciutto_e_funghi_(2010)_by_RaBoe.jpg",
+    "requete": "Pizza prosciutto e funghi",
+    "niveau": "exact"
+  },
+  "Le Pizze::Calzone": {
+    "fichier": "/photos/plats/calzone.jpg",
+    "auteur": "Mario56",
+    "licence": "CC BY-SA 3.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Calzone_Tradition_%2B_poivrons.JPG",
+    "requete": "Calzone pizza",
+    "niveau": "exact"
+  },
+  "Le Pizze::Venezia": {
+    "fichier": "/photos/plats/venezia.jpg",
+    "auteur": "Daderot",
+    "licence": "CC0",
+    "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_with_roasted_eggplant,_marinara,_spicy_breadcrumbs,_parmigiana,_basil_-_San_Francisco,_CA.jpg",
+    "requete": "Pizza with roasted eggplant, marinara, spicy breadcrumbs, parmigiana, basil - San Francisco, CA",
+    "niveau": "approchant"
+  },
+  "Le Pizze::Regina": {
+    "fichier": "/photos/plats/regina.jpg",
+    "auteur": "© Ra Boe / Wikipedia Create the proper attribution for your usage by clicking on this button! This file is licensed under the Creative Commons Attribution-Share Alike 3.0 Germany license.Attribution: Ra Boe / Wikipedia You are free: to share – to copy, distribute and transmit the work to remix – to adapt the work Under the following conditions: attribution – You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use. share alike – If you remix, transform, or build upon the material, you must distribute your contributions under the same or compatible license as the original.https://creativecommons.org/licenses/by-sa/3.0/de/deed.enCC BY-SA 3.0 deCreative Commons Attribution-Share Alike 3.0 detruetrue Internet: Titel Foto: Ra Boe / Wikipedia, Original; Lizenz: CC by-sa 3.0 Print: Titel Foto: Ra Boe / Wikipedia, Lizenz: CC by-sa 3.0 I have published this image as author Ra Boe under the \"CC-BY-SA-3.0\" in Wikipedia. This means that free, commercial usage outside of Wikipedia is permitted under the following licence terms: Online media: The author \" RaBoe/Wikipedia \" is named A weblink to the original image is provided: //commons.wikimedia.org/wiki/File:Pizza_prosciutto_e_funghi_(2010)_by_RaBoe.jpg A copy of, or the Uniform Resource Identifier (https://creativecommons.org/licenses/by-sa/3.0/de/legalcode) for, this License with every copy Print media: The author \" RaBoe/Wikipedia\" is named A copy of, or the Uniform Resource Identifier (https://creativecommons.org/licenses/by-sa/3.0/de/legalcode) for, this License with every copy Please send me a specimen copy or the URL of the website where the image is used. Please write an email to raboe001-at-web.de, if you need the image in a higher resolution need my postal address for sending a specimen copy have further questions about the terms of the licence PS: In case of refusal of the above terms the author reserves the right to take legal action. This license and the rights granted hereunder will terminate automatically upon any breach by you of the terms of this license. In this case the author reserves to demand declaration to cease and desist, and compensation (according to the MFM fee references currently in force). Any of the above conditions can be waived if you get permission from the copyright holder. Foto selbst aufgenommen mit Nikon-D50: Objektiv Tamron 18 - 250 mmvon Wikipedia-User: Ra Boe This photo was taken with an Nikon-D50:, Objective Tamron 18 - 250 mm by Wikipedia user: Ra Boe",
+    "licence": "CC BY-SA 3.0 de",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_prosciutto_e_funghi_(2010)_by_RaBoe.jpg",
+    "requete": "Pizza regina",
+    "niveau": "approchant"
+  },
+  "Le Pizze::Diavola": {
+    "fichier": "/photos/plats/diavola.jpg",
+    "auteur": "掬茶",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_Diavola_(Verde_Ischia).jpg",
+    "requete": "Pizza Diavola (Verde Ischia)",
+    "niveau": "exact"
+  },
+  "Le Pizze::Vesuvio": {
+    "fichier": "/photos/plats/vesuvio.jpg",
+    "auteur": "Guilhem Vellut from Paris, France",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Vesuvio_Pizza,_Tatou_Pizza,_Paris_002.jpg",
+    "requete": "Pizza vesuvio",
+    "niveau": "approchant"
+  },
+  "Le Pizze::Padrino": {
+    "fichier": "/photos/plats/padrino.jpg",
+    "auteur": "Phil Whitehouse from London, United Kingdom",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_capricciosa.jpg",
+    "requete": "Pizza carciofi prosciutto funghi",
+    "niveau": "approchant"
+  },
+  "Le Pizze::Cappriciosa": {
+    "fichier": "/photos/plats/cappriciosa.jpg",
+    "auteur": "Phil Whitehouse from London, United Kingdom",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_capricciosa.jpg",
+    "requete": "Pizza capricciosa",
+    "niveau": "exact"
+  },
+  "Le Pizze::Quattro Formaggi": {
+    "fichier": "/photos/plats/quattro-formaggi.jpg",
+    "auteur": "Ewan Munro from London, UK",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_quattro_formaggi_at_restaurant,_Chalk_Farm_Road,_London.jpg",
+    "requete": "Pizza quattro formaggi",
+    "niveau": "exact"
+  },
+  "Le Pizze::Paysanne": {
+    "fichier": "/photos/plats/paysanne.jpg",
+    "auteur": "Alpha from Melbourne, Australia",
+    "licence": "CC BY-SA 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Senor_Lupo_Pizza_-_Sausage,_Roasted_Onions,_Capsicums_and_Cauliflower_-_Mr_Wolf_(538386919).jpg",
+    "requete": "Pizza with onions and sausage",
+    "niveau": "approchant"
+  },
+  "Le Pizze::Don Elio": {
+    "fichier": "/photos/plats/don-elio.jpg",
+    "auteur": "JIP",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_Tonno_at_Leonardo.jpg",
+    "requete": "Pizza Tonno at Leonardo",
+    "niveau": "approchant"
+  },
+  "Le Pizze::Frutti di Mare": {
+    "fichier": "/photos/plats/frutti-di-mare.jpg",
+    "auteur": "投稿者",
+    "licence": "Public domain",
+    "licence_url": "",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Seafood_pizza_(1).jpg",
+    "requete": "Pizza ai frutti di mare",
+    "niveau": "exact"
+  },
+  "Le Pizze::Pizza PV": {
+    "fichier": "/photos/plats/pizza-pv.jpg",
+    "auteur": "Andy Li",
+    "licence": "CC0",
+    "licence_url": "http://creativecommons.org/publicdomain/zero/1.0/deed.en",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Ortolana_pizza_-_Nanninella.jpg",
+    "requete": "Ortolana pizza - Nanninella",
+    "niveau": "approchant"
+  },
+  "Le Pizze::Parma": {
+    "fichier": "/photos/plats/parma.jpg",
+    "auteur": "Amin",
+    "licence": "CC BY-SA 4.0",
+    "licence_url": "https://creativecommons.org/licenses/by-sa/4.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Parma_ham_pizza_Prosciutto_crudo_laliva_restaurant_bangkok.jpg",
+    "requete": "Pizza crudo di Parma",
+    "niveau": "exact"
   }
 }
