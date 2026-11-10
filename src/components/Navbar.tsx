@@ -1,10 +1,12 @@
 import React, { useState } from 'react';
-import { Menu, X, Phone } from 'lucide-react';
+import { Menu, X, Phone, ShoppingBag, Calendar } from 'lucide-react';
 import { RESTAURANT_DATA } from '../data/restaurantData';
 import { MODE_DEMO, BANDEAU_DEMO_HAUT } from '../config';
+import { useCart } from '../context/CartContext';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+  const { totalItemsCount, openCart } = useCart();
   const lieu = RESTAURANT_DATA.lieux[0];
 
   return (
@@ -27,10 +29,13 @@ export const Navbar: React.FC = () => {
           />
         </a>
 
-        {/* Liens Desktop : Menu, Infos, Contact */}
+        {/* Liens Desktop : Menu, Réserver, Infos, Contact */}
         <nav aria-label="Navigation principale" className="hidden md:flex items-center gap-6 text-sm text-[#2B1A12]">
           <a href="#menu" className="hover:text-[#A84A15] font-medium transition">
             Menu
+          </a>
+          <a href="#reserver" className="hover:text-[#A84A15] font-medium transition flex items-center gap-1">
+            Réserver
           </a>
           <a href="#infos" className="hover:text-[#A84A15] font-medium transition">
             Infos
@@ -40,26 +45,45 @@ export const Navbar: React.FC = () => {
           </a>
         </nav>
 
-        {/* Bouton Appeler (bouton plein en #A84A15 avec texte blanc) */}
-        <div className="hidden sm:flex items-center gap-3">
-          <a
-            href={`tel:${lieu.telephone}`}
-            className="px-4 py-2 rounded-lg bg-[#A84A15] hover:bg-[#8D3C0F] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition"
-          >
-            <Phone className="w-3.5 h-3.5" aria-hidden="true" />
-            <span>Appeler</span>
-          </a>
-        </div>
-
-        {/* Déclencheur mobile */}
-        <div className="md:hidden flex items-center">
+        {/* Boutons d'action Droite : Panier & Appeler */}
+        <div className="flex items-center gap-2 sm:gap-3">
+          {/* Bouton Panier avec badge */}
           <button
-            onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
-            aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-            className="p-2 text-[#2B1A12] hover:bg-[#EFE5D6] rounded-lg transition"
+            type="button"
+            onClick={openCart}
+            aria-label={`Ouvrir le panier, ${totalItemsCount} article(s)`}
+            className="relative px-3 py-2 rounded-lg bg-[#FBF6EE] hover:bg-[#F0E6D8] text-[#2B1A12] border border-[#D9C8B4] transition flex items-center gap-1.5 text-xs font-semibold shadow-2xs cursor-pointer"
           >
-            {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            <ShoppingBag className="w-4 h-4 text-[#A84A15]" />
+            <span className="hidden sm:inline">Panier</span>
+            {totalItemsCount > 0 && (
+              <span className="bg-[#A84A15] text-white text-[10px] font-bold px-1.5 py-0.2 rounded-full tabular-nums">
+                {totalItemsCount}
+              </span>
+            )}
           </button>
+
+          {/* Bouton Appeler (bouton plein en #A84A15 avec texte blanc) */}
+          <div className="hidden sm:flex items-center">
+            <a
+              href={`tel:${lieu.telephone}`}
+              className="px-4 py-2 rounded-lg bg-[#A84A15] hover:bg-[#8D3C0F] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition shadow-2xs"
+            >
+              <Phone className="w-3.5 h-3.5" aria-hidden="true" />
+              <span>Appeler</span>
+            </a>
+          </div>
+
+          {/* Déclencheur mobile */}
+          <div className="md:hidden flex items-center">
+            <button
+              onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+              aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
+              className="p-2 text-[#2B1A12] hover:bg-[#EFE5D6] rounded-lg transition"
+            >
+              {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+            </button>
+          </div>
         </div>
       </div>
 
@@ -73,6 +97,28 @@ export const Navbar: React.FC = () => {
           >
             Menu
           </a>
+          <a
+            href="#reserver"
+            onClick={() => setMobileMenuOpen(false)}
+            className="block py-2 border-b border-[#EADFCF] hover:text-[#A84A15] font-semibold text-[#A84A15]"
+          >
+            Réserver une table
+          </a>
+          <button
+            type="button"
+            onClick={() => {
+              setMobileMenuOpen(false);
+              openCart();
+            }}
+            className="w-full text-left py-2 border-b border-[#EADFCF] hover:text-[#A84A15] flex items-center justify-between"
+          >
+            <span>Mon Panier</span>
+            {totalItemsCount > 0 && (
+              <span className="bg-[#A84A15] text-white text-xs font-bold px-2 py-0.5 rounded-full">
+                {totalItemsCount}
+              </span>
+            )}
+          </button>
           <a
             href="#infos"
             onClick={() => setMobileMenuOpen(false)}

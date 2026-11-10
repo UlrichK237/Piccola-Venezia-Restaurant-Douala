@@ -1,5 +1,5 @@
 import React, { useState, useEffect, useRef } from 'react';
-import { Phone, Navigation, Clock, Play, Pause } from 'lucide-react';
+import { Phone, Navigation, Clock, Play, Pause, Calendar } from 'lucide-react';
 import { RESTAURANT_DATA } from '../data/restaurantData';
 
 export const Hero: React.FC = () => {
@@ -150,6 +150,14 @@ export const Hero: React.FC = () => {
 
         {/* Boutons d'action concrets */}
         <div className="flex flex-wrap items-center justify-center gap-3 pt-2">
+          <a
+            href="#reserver"
+            className="px-6 py-3 rounded-lg bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] text-sm font-bold inline-flex items-center gap-2 transition shadow-md"
+          >
+            <Calendar className="w-4 h-4 text-[#2B1A12]" aria-hidden="true" />
+            <span>Réserver une table</span>
+          </a>
+
           <a
             href={`tel:${lieu.telephone}`}
             className="px-6 py-3 rounded-lg bg-[#A84A15] hover:bg-[#8D3C0F] text-white text-sm font-semibold inline-flex items-center gap-2 transition shadow-sm"

@@ -1,9 +1,10 @@
 import React, { useState, useEffect, useRef, useMemo } from 'react';
-import { Search, ArrowUp, Camera } from 'lucide-react';
+import { Search, ArrowUp, Camera, Plus, Minus } from 'lucide-react';
 import { RESTAURANT_DATA, Plat, CategorieMenu } from '../data/restaurantData';
 import corrections from '../data/corrections.json';
 import platPhotosData from '../data/platPhotos.json';
 import { PlatModal, PlatPhotoInfo } from './PlatModal';
+import { useCart } from '../context/CartContext';
 
 interface MenuSectionProps {
   onSelectPlat?: (plat: Plat) => void;
@@ -77,6 +78,7 @@ const getCategorySlug = (catName: string): string => {
 };
 
 export const MenuSection: React.FC<MenuSectionProps> = () => {
+  const { addItem, updateQuantity, getItemQuantity } = useCart();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -386,6 +388,71 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
                             ({plat.note})
                           </span>
                         )}
+
+                        {/* Barre d'action Panier : Bouton Ajouter au panier & Sélecteur de quantité (+ / −) */}
+                        {(() => {
+                          const currentQty = getItemQuantity(photoKey);
+                          return (
+                            <div className="mt-2.5 pt-2 border-t border-[#EADFCF]/60 flex items-center justify-between gap-2">
+                              <span className="text-[11px] text-[#6B5446]">
+                                {currentQty > 0 ? (
+                                  <span className="inline-flex items-center gap-1 font-semibold text-[#A84A15]">
+                                    <span className="w-1.5 h-1.5 rounded-full bg-[#A84A15]" />
+                                    {currentQty} dans le panier
+                                  </span>
+                                ) : (
+                                  <span className="text-[10px] text-[#6B5446]/60">Spécialité maison</span>
+                                )}
+                              </span>
+
+                              <div className="inline-flex items-center gap-1.5 ml-auto">
+                                {currentQty === 0 ? (
+                                  <button
+                                    type="button"
+                                    onClick={() =>
+                                      addItem(
+                                        {
+                                          nom: plat.nom,
+                                          categorie: cat.categorie,
+                                          prix: plat.prix,
+                                          image: photoInfo?.fichier
+                                        },
+                                        1
+                                      )
+                                    }
+                                    aria-label={`Ajouter ${correctedNom} au panier`}
+                                    className="px-3 py-1.5 rounded-lg bg-[#EB7F36]/20 hover:bg-[#EB7F36] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-1.5 transition border border-[#EB7F36]/40 cursor-pointer shadow-2xs hover:scale-102 active:scale-98"
+                                  >
+                                    <Plus className="w-3.5 h-3.5 text-[#A84A15]" />
+                                    <span>Ajouter au panier</span>
+                                  </button>
+                                ) : (
+                                  <div className="inline-flex items-center rounded-lg border border-[#EB7F36] bg-white overflow-hidden shadow-2xs">
+                                    <button
+                                      type="button"
+                                      onClick={() => updateQuantity(photoKey, -1)}
+                                      aria-label={`Diminuer la quantité de ${correctedNom}`}
+                                      className="p-1 px-2.5 text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8] transition cursor-pointer"
+                                    >
+                                      <Minus className="w-3 h-3" />
+                                    </button>
+                                    <span className="px-2.5 py-0.5 text-xs font-bold text-[#A84A15] tabular-nums min-w-[24px] text-center bg-[#EB7F36]/15">
+                                      {currentQty}
+                                    </span>
+                                    <button
+                                      type="button"
+                                      onClick={() => updateQuantity(photoKey, 1)}
+                                      aria-label={`Augmenter la quantité de ${correctedNom}`}
+                                      className="p-1 px-2.5 text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8] transition cursor-pointer"
+                                    >
+                                      <Plus className="w-3 h-3" />
+                                    </button>
+                                  </div>
+                                )}
+                              </div>
+                            </div>
+                          );
+                        })()}
                       </li>
                     );
                   })}
