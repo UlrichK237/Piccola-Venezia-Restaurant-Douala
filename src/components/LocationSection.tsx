@@ -1,15 +1,14 @@
 import React from 'react';
-import { MapPin, Phone, Clock, Navigation, Calendar } from 'lucide-react';
+import { MapPin, Phone, Clock, Navigation, Calendar, ShoppingBag } from 'lucide-react';
 import { RESTAURANT_DATA } from '../data/restaurantData';
+import { useCart } from '../context/CartContext';
+import { getPhoneDigits, urlHttpsSure } from '../lib/securite';
 
-interface LocationSectionProps {
-  onOpenReservation: () => void;
-}
-
-export const LocationSection: React.FC<LocationSectionProps> = ({ onOpenReservation }) => {
+export const LocationSection: React.FC = () => {
   const lieu = RESTAURANT_DATA.lieux[0];
-  const whatsappDigits = (lieu.whatsapp || '').replace(/[^0-9]/g, '');
-  const hasWhatsapp = Boolean(lieu.whatsapp && whatsappDigits.length > 0);
+  const { openCart } = useCart();
+  const telDigits = getPhoneDigits(lieu.telephone);
+  const safeMapsUrl = urlHttpsSure(lieu.maps_url);
 
   return (
     <>
@@ -41,7 +40,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ onOpenReservat
               </p>
             </div>
 
-            {/* Horaires (uniquement si présents dans data.json) */}
+            {/* Horaires */}
             {lieu.horaires && (
               <div className="p-5 rounded-lg bg-[#F0E6D8]/60 border border-[#EADFCF] space-y-2">
                 <div className="flex items-center gap-2 text-[#A84A15]">
@@ -79,7 +78,7 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ onOpenReservat
               <h3 className="font-semibold text-sm">Téléphone</h3>
             </div>
             <a
-              href={`tel:${lieu.telephone}`}
+              href={`tel:${telDigits}`}
               className="text-base font-semibold text-[#2B1A12] hover:text-[#A84A15] block transition"
             >
               {lieu.telephone}
@@ -88,33 +87,43 @@ export const LocationSection: React.FC<LocationSectionProps> = ({ onOpenReservat
             {/* Boutons d'action concrets */}
             <div className="flex flex-wrap items-center gap-2.5 sm:gap-3 pt-2">
               <a
-                href={`tel:${lieu.telephone}`}
-                className="px-4 sm:px-5 py-2.5 rounded-lg bg-[#A84A15] hover:bg-[#8D3C0F] text-white text-xs font-semibold inline-flex items-center gap-2 transition"
+                href={`tel:${telDigits}`}
+                className="px-4 sm:px-5 py-2.5 rounded-lg bg-[#A84A15] hover:bg-[#8D3C0F] text-white text-xs font-semibold inline-flex items-center gap-2 transition shadow-2xs"
               >
                 <Phone className="w-3.5 h-3.5" aria-hidden="true" />
                 <span>Appeler</span>
               </a>
 
+              {safeMapsUrl && (
+                <a
+                  href={safeMapsUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="px-4 sm:px-5 py-2.5 rounded-lg bg-[#F0E6D8] hover:bg-[#E5D7C4] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-2 transition border border-[#D9C8B4]"
+                >
+                  <Navigation className="w-3.5 h-3.5 text-[#A84A15]" aria-hidden="true" />
+                  <span>Itinéraire</span>
+                </a>
+              )}
+
+              {/* Lien d'ancre vers la réservation */}
               <a
-                href={lieu.maps_url}
-                target="_blank"
-                rel="noreferrer"
-                className="px-4 sm:px-5 py-2.5 rounded-lg bg-[#F0E6D8] hover:bg-[#E5D7C4] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-2 transition border border-[#D9C8B4]"
+                href="#reservation"
+                className="px-4 sm:px-5 py-2.5 rounded-lg bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-2 transition shadow-2xs"
               >
-                <Navigation className="w-3.5 h-3.5 text-[#A84A15]" aria-hidden="true" />
-                <span>Itinéraire</span>
+                <Calendar className="w-3.5 h-3.5 text-[#2B1A12]" aria-hidden="true" />
+                <span>Réserver une table</span>
               </a>
 
-              {/* Bouton Commander / Réserver affiché uniquement si whatsapp n'est pas null et contient des chiffres */}
-              {hasWhatsapp && (
-                <button
-                  onClick={onOpenReservation}
-                  className="px-4 sm:px-5 py-2.5 rounded-lg bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-2 transition"
-                >
-                  <Calendar className="w-3.5 h-3.5 text-[#2B1A12]" aria-hidden="true" />
-                  <span>Commander / Réserver</span>
-                </button>
-              )}
+              {/* Bouton qui ouvre le panier de commande */}
+              <button
+                type="button"
+                onClick={openCart}
+                className="px-4 sm:px-5 py-2.5 rounded-lg bg-[#F0E6D8] hover:bg-[#E5D7C4] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-2 transition border border-[#D9C8B4] cursor-pointer"
+              >
+                <ShoppingBag className="w-3.5 h-3.5 text-[#A84A15]" aria-hidden="true" />
+                <span>Commander des plats</span>
+              </button>
             </div>
           </div>
         </div>

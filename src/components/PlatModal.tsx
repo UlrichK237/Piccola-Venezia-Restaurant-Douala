@@ -1,6 +1,7 @@
 import React, { useEffect, useRef, useState } from 'react';
 import { X } from 'lucide-react';
 import { Plat } from '../data/restaurantData';
+import { urlHttpsSure } from '../lib/securite';
 import {
   applyCorrection,
   formatPrice,
@@ -165,28 +166,40 @@ export const PlatModal: React.FC<PlatModalProps> = ({
             </p>
             <p className="truncate">
               Photo : {photoInfo.auteur},{' '}
-              {photoInfo.licence_url ? (
-                <a
-                  href={photoInfo.licence_url}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-[#A84A15] underline hover:text-[#8D3C0F]"
-                >
-                  {photoInfo.licence}
-                </a>
-              ) : (
-                photoInfo.licence
-              )}{' '}
-              (
-              <a
-                href={photoInfo.source_url}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-[#A84A15] underline hover:text-[#8D3C0F]"
-              >
-                Wikimedia Commons
-              </a>
-              )
+              {(() => {
+                const safeLicenceUrl = urlHttpsSure(photoInfo.licence_url);
+                const safeSourceUrl = urlHttpsSure(photoInfo.source_url);
+                return (
+                  <>
+                    {safeLicenceUrl ? (
+                      <a
+                        href={safeLicenceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#A84A15] underline hover:text-[#8D3C0F]"
+                      >
+                        {photoInfo.licence}
+                      </a>
+                    ) : (
+                      <span>{photoInfo.licence}</span>
+                    )}{' '}
+                    (
+                    {safeSourceUrl ? (
+                      <a
+                        href={safeSourceUrl}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className="text-[#A84A15] underline hover:text-[#8D3C0F]"
+                      >
+                        Wikimedia Commons
+                      </a>
+                    ) : (
+                      <span>Wikimedia Commons</span>
+                    )}
+                    )
+                  </>
+                );
+              })()}
             </p>
           </div>
         )}

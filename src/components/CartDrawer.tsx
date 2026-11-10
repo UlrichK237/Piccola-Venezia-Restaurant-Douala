@@ -1,7 +1,9 @@
-import React, { useEffect, useRef } from 'react';
-import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { X, Trash2, Plus, Minus, ShoppingBag, ArrowRight, Edit3, Check } from 'lucide-react';
 import { useCart } from '../context/CartContext';
-import { formatFCFA } from '../config';
+import { formatFCFA, CONDITIONS } from '../config';
+import { useModalA11y } from '../hooks/useModalA11y';
+import { nettoyerTexte } from '../lib/securite';
 
 export const CartDrawer: React.FC = () => {
   const {
@@ -10,51 +12,50 @@ export const CartDrawer: React.FC = () => {
     closeCart,
     updateQuantity,
     removeItem,
+    updateRemarque,
     clearCart,
-    subtotal,
+    totalPlats,
     totalItemsCount,
     openCheckout
   } = useCart();
 
-  const drawerRef = useRef<HTMLDivElement>(null);
+  const closeBtnRef = useRef<HTMLButtonElement>(null);
+  const { containerRef } = useModalA11y({
+    isOpen,
+    onClose: closeCart,
+    initialFocusRef: closeBtnRef
+  });
 
-  // Fermeture par touche Échap
-  useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.key === 'Escape' && isOpen) {
-        closeCart();
-      }
-    };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, [isOpen, closeCart]);
-
-  // Blocage du défilement d'arrière-plan quand le tiroir est ouvert
-  useEffect(() => {
-    if (isOpen) {
-      document.body.style.overflow = 'hidden';
-    } else {
-      document.body.style.overflow = '';
-    }
-    return () => {
-      document.body.style.overflow = '';
-    };
-  }, [isOpen]);
+  const [editingRemarqueIdx, setEditingRemarqueIdx] = useState<number | null>(null);
+  const [tempRemarque, setTempRemarque] = useState<string>('');
 
   if (!isOpen) return null;
 
-  return (
-    <div className="fixed inset-0 z-50 overflow-hidden" role="dialog" aria-modal="true" aria-label="Panier de commande">
-      {/* Arrière-plan semi-transparent */}
-      <div
-        className="fixed inset-0 bg-black/60 backdrop-blur-xs transition-opacity duration-300"
-        onClick={closeCart}
-        aria-hidden="true"
-      />
+  const handleStartEditRemarque = (idx: number, currentRemarque?: string) => {
+    setEditingRemarqueIdx(idx);
+    setTempRemarque(currentRemarque || '');
+  };
 
+  const handleSaveRemarque = (idx: number) => {
+    updateRemarque(idx, tempRemarque);
+    setEditingRemarqueIdx(null);
+    setTempRemarque('');
+  };
+
+  return (
+    <div
+      role="presentation"
+      onClick={e => {
+        if (e.target === e.currentTarget) closeCart();
+      }}
+      className="fixed inset-0 z-50 overflow-hidden bg-black/60 backdrop-blur-[2px] transition-opacity duration-300"
+    >
       <div className="fixed inset-y-0 right-0 max-w-full flex pl-6 sm:pl-10">
         <div
-          ref={drawerRef}
+          ref={containerRef}
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="cart-drawer-title"
           className="w-screen max-w-md bg-[#FBF6EE] border-l border-[#EADFCF] shadow-2xl flex flex-col text-[#2B1A12] transition-transform duration-300 ease-out"
         >
           {/* En-tête du panier */}
@@ -64,19 +65,21 @@ export const CartDrawer: React.FC = () => {
                 <ShoppingBag className="w-5 h-5 text-[#A84A15]" aria-hidden="true" />
               </span>
               <div>
-                <h2 className="text-base sm:text-lg font-serif font-bold text-[#2B1A12]">
+                <h2 id="cart-drawer-title" className="text-base sm:text-lg font-serif font-bold text-[#2B1A12]">
                   Mon Panier
                 </h2>
                 <p className="text-xs text-[#6B5446]">
-                  {totalItemsCount} article{totalItemsCount > 1 ? 's' : ''} sélectionné{totalItemsCount > 1 ? 's' : ''}
+                  {totalItemsCount} article{totalItemsCount > 1 ? 's' : ''} • max 40
                 </p>
               </div>
             </div>
 
             <button
+              ref={closeBtnRef}
+              type="button"
               onClick={closeCart}
               aria-label="Fermer le panier"
-              className="p-2 rounded-lg text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#EADFCF] transition"
+              className="p-2 rounded-lg text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#EADFCF] transition cursor-pointer"
             >
               <X className="w-5 h-5" />
             </button>
@@ -98,75 +101,127 @@ export const CartDrawer: React.FC = () => {
                   </p>
                 </div>
                 <button
+                  type="button"
                   onClick={closeCart}
-                  className="px-5 py-2.5 rounded-lg bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] text-xs font-semibold transition shadow-xs"
+                  className="px-5 py-2.5 rounded-lg bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] text-xs font-semibold transition shadow-xs cursor-pointer"
                 >
                   Découvrir la carte
                 </button>
               </div>
             ) : (
-              <ul className="divide-y divide-[#EADFCF] space-y-3">
-                {items.map(item => (
-                  <li key={item.id} className="pt-3 first:pt-0 flex items-start gap-3">
-                    {/* Miniature */}
-                    {item.image ? (
-                      <img
-                        src={item.image}
-                        alt={item.platNom}
-                        className="w-16 h-16 rounded-lg object-cover border border-[#EADFCF] shrink-0"
-                        loading="lazy"
-                      />
-                    ) : (
-                      <div className="w-16 h-16 rounded-lg bg-[#F0E6D8] border border-[#EADFCF] flex items-center justify-center text-[#A84A15] font-serif font-bold text-xs shrink-0">
-                        PV
-                      </div>
-                    )}
-
-                    {/* Détails du plat */}
-                    <div className="flex-1 min-w-0">
-                      <div className="flex items-baseline justify-between gap-2">
-                        <h4 className="font-serif font-bold text-xs sm:text-sm text-[#2B1A12] truncate">
-                          {item.platNom}
-                        </h4>
-                        <span className="font-sans font-semibold text-xs sm:text-sm text-[#2B1A12] tabular-nums shrink-0">
-                          {formatFCFA(item.prix * item.quantite)}
-                        </span>
-                      </div>
-
-                      <p className="text-[11px] text-[#6B5446] mt-0.5">
-                        {item.categorie} • {formatFCFA(item.prix)} / unité
-                      </p>
-
-                      {/* Contrôles de quantité (+ / −) et suppression */}
-                      <div className="flex items-center justify-between mt-2.5">
-                        <div className="inline-flex items-center rounded-lg border border-[#D9C8B4] bg-white overflow-hidden shadow-2xs">
-                          <button
-                            onClick={() => updateQuantity(item.id, -1)}
-                            aria-label={`Diminuer la quantité de ${item.platNom}`}
-                            className="p-1 px-2 text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8] transition"
-                          >
-                            <Minus className="w-3 h-3" />
-                          </button>
-                          <span className="px-2.5 py-0.5 text-xs font-semibold text-[#2B1A12] tabular-nums min-w-[24px] text-center">
-                            {item.quantite}
+              <ul className="divide-y divide-[#EADFCF] space-y-3 list-none p-0 m-0">
+                {items.map((item, index) => (
+                  <li key={`${item.id}-${index}`} className="pt-3 first:pt-0 flex flex-col gap-2">
+                    <div className="flex items-start justify-between gap-2">
+                      <div className="flex-1 min-w-0">
+                        <div className="flex items-baseline justify-between gap-2">
+                          <h3 className="font-serif font-bold text-xs sm:text-sm text-[#2B1A12]">
+                            {item.platNom}
+                          </h3>
+                          <span className="font-sans font-semibold text-xs sm:text-sm text-[#2B1A12] tabular-nums shrink-0">
+                            {formatFCFA(item.prix * item.quantite)}
                           </span>
-                          <button
-                            onClick={() => updateQuantity(item.id, 1)}
-                            aria-label={`Augmenter la quantité de ${item.platNom}`}
-                            className="p-1 px-2 text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8] transition"
-                          >
-                            <Plus className="w-3 h-3" />
-                          </button>
                         </div>
 
+                        <p className="text-[11px] text-[#6B5446] mt-0.5">
+                          {item.categorie} • {formatFCFA(item.prix)} / unité
+                        </p>
+
+                        {/* Options sélectionnées */}
+                        {item.options && item.options.length > 0 && (
+                          <div className="mt-1 flex flex-wrap gap-1">
+                            {item.options.map(opt => (
+                              <span
+                                key={opt}
+                                className="inline-block text-[10px] bg-[#F0E6D8] text-[#A84A15] px-2 py-0.5 rounded font-medium"
+                              >
+                                {opt}
+                              </span>
+                            ))}
+                          </div>
+                        )}
+
+                        {/* Remarque pour la ligne */}
+                        {editingRemarqueIdx === index ? (
+                          <div className="mt-2 flex items-center gap-1.5">
+                            <input
+                              type="text"
+                              maxLength={120}
+                              value={tempRemarque}
+                              onChange={e => setTempRemarque(e.target.value)}
+                              placeholder="Remarque (max 120 car.)"
+                              className="flex-1 px-2.5 py-1 text-xs rounded border border-[#D9C8B4] bg-white text-[#2B1A12] focus:outline-none focus:border-[#A84A15]"
+                            />
+                            <button
+                              type="button"
+                              onClick={() => handleSaveRemarque(index)}
+                              className="p-1 rounded bg-[#A84A15] text-white hover:bg-[#8D3C0F]"
+                              aria-label="Enregistrer la remarque"
+                            >
+                              <Check className="w-3.5 h-3.5" />
+                            </button>
+                            <button
+                              type="button"
+                              onClick={() => setEditingRemarqueIdx(null)}
+                              className="p-1 rounded text-[#6B5446] hover:bg-[#EADFCF]"
+                              aria-label="Annuler"
+                            >
+                              <X className="w-3.5 h-3.5" />
+                            </button>
+                          </div>
+                        ) : (
+                          <div className="mt-1.5 flex items-center gap-2">
+                            {item.remarque ? (
+                              <p className="text-[11px] text-[#A84A15] italic line-clamp-1">
+                                « {item.remarque} »
+                              </p>
+                            ) : null}
+                            <button
+                              type="button"
+                              onClick={() => handleStartEditRemarque(index, item.remarque)}
+                              className="text-[10px] text-[#6B5446] hover:text-[#A84A15] underline inline-flex items-center gap-0.5"
+                            >
+                              <Edit3 className="w-2.5 h-2.5" />
+                              <span>{item.remarque ? 'Modifier note' : '+ Ajouter une note'}</span>
+                            </button>
+                          </div>
+                        )}
+                      </div>
+                    </div>
+
+                    {/* Contrôles de quantité (+ / −) et suppression */}
+                    <div className="flex items-center justify-between pt-1">
+                      <div className="inline-flex items-center rounded-lg border border-[#D9C8B4] bg-white overflow-hidden shadow-2xs">
                         <button
-                          onClick={() => removeItem(item.id)}
-                          aria-label={`Supprimer ${item.platNom} du panier`}
-                          className="p-1.5 text-[#A84A15]/70 hover:text-[#A84A15] hover:bg-[#F0E6D8] rounded-md transition"
+                          type="button"
+                          onClick={() => updateQuantity(index, -1)}
+                          aria-label={`Diminuer la quantité de ${item.platNom}`}
+                          className="p-1 px-2.5 text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8] transition cursor-pointer"
                         >
-                          <Trash2 className="w-3.5 h-3.5" />
+                          <Minus className="w-3 h-3" />
+                        </button>
+                        <span className="px-2.5 py-0.5 text-xs font-semibold text-[#2B1A12] tabular-nums min-w-[28px] text-center">
+                          {item.quantite}
+                        </span>
+                        <button
+                          type="button"
+                          onClick={() => updateQuantity(index, 1)}
+                          aria-label={`Augmenter la quantité de ${item.platNom}`}
+                          disabled={item.quantite >= 20 || totalItemsCount >= 40}
+                          className="p-1 px-2.5 text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8] transition disabled:opacity-40 cursor-pointer"
+                        >
+                          <Plus className="w-3 h-3" />
                         </button>
                       </div>
+
+                      <button
+                        type="button"
+                        onClick={() => removeItem(index)}
+                        aria-label={`Supprimer ${item.platNom} du panier`}
+                        className="p-1.5 text-[#A84A15]/80 hover:text-[#A84A15] hover:bg-[#F0E6D8] rounded-md transition cursor-pointer"
+                      >
+                        <Trash2 className="w-4 h-4" />
+                      </button>
                     </div>
                   </li>
                 ))}
@@ -174,37 +229,37 @@ export const CartDrawer: React.FC = () => {
             )}
           </div>
 
-          {/* Pied de tiroir : Sous-total et bouton Commander */}
+          {/* Pied de tiroir : Total des plats et bouton Commander */}
           {items.length > 0 && (
             <div className="p-4 sm:p-5 bg-[#F0E6D8] border-t border-[#EADFCF] space-y-3">
               <div className="flex items-baseline justify-between text-xs sm:text-sm">
-                <span className="text-[#6B5446]">Sous-total articles :</span>
+                <span className="text-[#2B1A12] font-semibold">Total des plats :</span>
                 <span className="font-serif font-bold text-base sm:text-lg text-[#2B1A12] tabular-nums">
-                  {formatFCFA(subtotal)}
+                  {formatFCFA(totalPlats)}
                 </span>
               </div>
 
-              <div className="flex items-center justify-between text-[11px] text-[#6B5446]">
-                <span>Frais de livraison :</span>
-                <span>Calculés à l'étape suivante</span>
-              </div>
+              {CONDITIONS.fraisLivraisonFCFA !== null && (
+                <div className="flex items-center justify-between text-[11px] text-[#6B5446]">
+                  <span>Frais de livraison :</span>
+                  <span>{formatFCFA(CONDITIONS.fraisLivraisonFCFA)}</span>
+                </div>
+              )}
 
               <div className="pt-2 flex flex-col gap-2">
                 <button
+                  type="button"
                   onClick={openCheckout}
-                  className="w-full py-3 px-4 rounded-xl bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition shadow-sm"
+                  className="w-full py-3 px-4 rounded-xl bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
                 >
-                  <span>Passer la commande</span>
+                  <span>Commander</span>
                   <ArrowRight className="w-4 h-4" />
                 </button>
 
                 <button
-                  onClick={() => {
-                    if (window.confirm('Voulez-vous vraiment vider votre panier ?')) {
-                      clearCart();
-                    }
-                  }}
-                  className="w-full py-2 text-[11px] text-[#6B5446] hover:text-[#A84A15] transition text-center underline underline-offset-2"
+                  type="button"
+                  onClick={clearCart}
+                  className="w-full py-1.5 text-[11px] text-[#6B5446] hover:text-[#A84A15] transition text-center underline underline-offset-2 cursor-pointer"
                 >
                   Vider le panier
                 </button>

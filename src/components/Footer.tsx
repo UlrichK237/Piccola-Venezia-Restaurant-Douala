@@ -1,10 +1,15 @@
 import React from 'react';
 import { ArrowUp } from 'lucide-react';
 import { RESTAURANT_DATA } from '../data/restaurantData';
-import { MODE_DEMO } from '../config';
+import { getPhoneDigits } from '../lib/securite';
 
-export const Footer: React.FC = () => {
+interface FooterProps {
+  onOpenPrivacy?: () => void;
+}
+
+export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
   const lieu = RESTAURANT_DATA.lieux[0];
+  const telDigits = getPhoneDigits(lieu.telephone);
 
   const scrollToTop = () => {
     window.scrollTo({ top: 0, behavior: 'smooth' });
@@ -32,15 +37,16 @@ export const Footer: React.FC = () => {
 
           <div className="flex items-center gap-4 text-xs">
             <a
-              href={`tel:${lieu.telephone}`}
+              href={`tel:${telDigits}`}
               className="text-[#A84A15] hover:underline font-medium"
             >
               {lieu.telephone}
             </a>
             <span>•</span>
             <button
+              type="button"
               onClick={scrollToTop}
-              className="inline-flex items-center gap-1 hover:text-[#2B1A12] transition"
+              className="inline-flex items-center gap-1 hover:text-[#2B1A12] transition cursor-pointer"
             >
               <span>Haut de page</span>
               <ArrowUp className="w-3.5 h-3.5" aria-hidden="true" />
@@ -52,9 +58,15 @@ export const Footer: React.FC = () => {
           <div>
             © {new Date().getFullYear()} {RESTAURANT_DATA.restaurant.nom}
           </div>
-          {MODE_DEMO && (
+          {onOpenPrivacy && (
             <div>
-              Site officiel
+              <button
+                type="button"
+                onClick={onOpenPrivacy}
+                className="text-[#6B5446] hover:text-[#A84A15] underline transition cursor-pointer"
+              >
+                Confidentialité
+              </button>
             </div>
           )}
         </div>

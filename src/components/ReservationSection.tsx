@@ -1,416 +1,521 @@
-import React, { useState } from 'react';
-import { Calendar, Clock, Users, Send, CheckCircle2, AlertCircle, Phone, User, Mail, Sparkles, MessageSquare } from 'lucide-react';
+import React, { useState, useMemo, useRef } from 'react';
+import { Calendar, Clock, Users, Send, Phone, Copy, Check, ExternalLink, Sparkles } from 'lucide-react';
 import { RESERVATION_SETTINGS, RESTAURANT_WHATSAPP_DISPLAY } from '../config';
-import { ReservationData } from '../types/order';
+import { RESTAURANT_DATA } from '../data/restaurantData';
 import {
-  generateReservationNumber,
-  checkSlotAvailability,
-  saveReservation,
-  generateWhatsAppReservationUrl
-} from '../services/reservationService';
-import { validateCameroonPhone } from '../services/orderService';
+  nettoyerTexte,
+  validateNom,
+  validateCameroonPhone,
+  getPhoneDigits
+} from '../lib/securite';
+import {
+  buildWhatsAppUrl,
+  buildSimpleWhatsAppUrl,
+  isWhatsAppUrlTooLong,
+  openWhatsApp
+} from '../lib/whatsapp';
 
-export const ReservationSection: React.FC = () => {
-  const todayIso = new Date().toISOString().split('T')[0];
+interface ReservationSectionProps {
+  onOpenPrivacy?: () => void;
+}
 
-  const [name, setName] = useState('');
-  const [phone, setPhone] = useState('');
-  const [email, setEmail] = useState('');
+/**
+ * Analyse la chaîne d'horaires (ex: "11:30 - 22:30", "11h30 – 23h")
+ * et génère les créneaux par pas de 30 min jusqu'à 60 min avant la fermeture.
+ */
+function genererCreneauxHoraires(horairesStr: string): string[] {
+  if (!horairesStr) return [];
+
+  const match = horairesStr.match(/(\d{1,2})[h:]?(\d{2})?\s*[-—–]\s*(\d{1,2})[h:]?(\d{2})?/i);
+  if (!match) return [];
+
+  const hDebut = parseInt(match[1], 10);
+  const mDebut = match[2] ? parseInt(match[2], 10) : 0;
+  const hFin = parseInt(match[3], 10);
+  const mFin = match[4] ? parseInt(match[4], 10) : 0;
+
+  if (isNaN(hDebut) || isNaN(hFin)) return [];
+
+  const debutMins = hDebut * 60 + mDebut;
+  const finMins = hFin * 60 + mFin;
+
+  // Créneaux jusqu'à 60 min avant la fermeture
+  const dernierCreneauMins = finMins - 60;
+  if (dernierCreneauMins <= debutMins) return [];
+
+  const slots: string[] = [];
+  for (let m = debutMins; m <= dernierCreneauMins; m += 30) {
+    const hh = Math.floor(m / 60);
+    const mm = m % 60;
+    slots.push(`${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`);
+  }
+
+  return slots;
+}
+
+export const ReservationSection: React.FC<ReservationSectionProps> = ({ onOpenPrivacy }) => {
+  const lieu = RESTAURANT_DATA.lieux[0];
+  const telRestaurantDigits = getPhoneDigits(lieu.telephone);
+
+  // Calcul des dates min et max
+  const { todayIso, maxDateIso, nowMinutes } = useMemo(() => {
+    const now = new Date();
+    const today = now.toISOString().split('T')[0];
+    const maxDate = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
+    const minutes = now.getHours() * 60 + now.getMinutes();
+    return { todayIso: today, maxDateIso: maxDate, nowMinutes: minutes };
+  }, []);
+
+  // Génération des créneaux
+  const allSlots = useMemo(() => {
+    return genererCreneauxHoraires(lieu.horaires);
+  }, [lieu.horaires]);
+
+  // Formulaire
+  const [nom, setNom] = useState('');
+  const [telephone, setTelephone] = useState('');
   const [date, setDate] = useState(todayIso);
-  const [heure, setHeure] = useState(RESERVATION_SETTINGS.creneauxMidi[0]);
+  const [heure, setHeure] = useState('');
+  const [heureManuelle, setHeureManuelle] = useState('');
   const [personnes, setPersonnes] = useState(2);
   const [occasion, setOccasion] = useState(RESERVATION_SETTINGS.occasions[0]);
   const [demandes, setDemandes] = useState('');
 
-  const [errors, setErrors] = useState<{ name?: string; phone?: string; general?: string }>({});
-  const [isSubmitting, setIsSubmitting] = useState(false);
-  const [confirmedReservation, setConfirmedReservation] = useState<ReservationData | null>(null);
+  const [errors, setErrors] = useState<{
+    nom?: string;
+    telephone?: string;
+    date?: string;
+    heure?: string;
+  }>({});
+
+  const [isSubmitted, setIsSubmitted] = useState(false);
+  const [preparedMessage, setPreparedMessage] = useState('');
+  const [copied, setCopied] = useState(false);
+
+  // Filtrage des créneaux disponibles selon la date choisie
+  const availableSlots = useMemo(() => {
+    if (date === todayIso) {
+      // Masque les créneaux qui commencent dans moins de 60 minutes
+      const seuilMins = nowMinutes + 60;
+      return allSlots.filter(s => {
+        const [h, m] = s.split(':').map(Number);
+        return h * 60 + m >= seuilMins;
+      });
+    }
+    return allSlots;
+  }, [date, todayIso, nowMinutes, allSlots]);
+
+  // Sélectionne par défaut le premier créneau disponible si non sélectionné
+  React.useEffect(() => {
+    if (availableSlots.length > 0 && !availableSlots.includes(heure)) {
+      setHeure(availableSlots[0]);
+    }
+  }, [availableSlots, heure]);
 
   const validateForm = (): boolean => {
-    const newErrors: { name?: string; phone?: string; general?: string } = {};
+    const newErrors: { nom?: string; telephone?: string; date?: string; heure?: string } = {};
 
-    if (!name.trim()) {
-      newErrors.name = 'Veuillez saisir votre nom complet.';
+    const nomVal = validateNom(nom);
+    if (!nomVal.isValid) {
+      newErrors.nom = nomVal.error;
     }
 
-    const phoneValidation = validateCameroonPhone(phone);
-    if (!phoneValidation.valid) {
-      newErrors.phone = phoneValidation.error;
+    const phoneVal = validateCameroonPhone(telephone);
+    if (!phoneVal.isValid) {
+      newErrors.telephone = phoneVal.error;
     }
 
-    if (date < todayIso) {
-      newErrors.general = 'Impossible de réserver pour une date passée.';
+    if (!date || date < todayIso || date > maxDateIso) {
+      newErrors.date = 'Veuillez choisir une date valide (entre aujourd’hui et 60 jours).';
+    }
+
+    const finalHeure = allSlots.length > 0 ? heure : heureManuelle;
+    if (!finalHeure) {
+      newErrors.heure = 'Veuillez sélectionner ou indiquer une heure.';
+    } else if (allSlots.length === 0 && !/^([01]\d|2[0-3]):[0-5]\d$/.test(finalHeure)) {
+      newErrors.heure = 'Format d’heure invalide (HH:MM attendu).';
     }
 
     setErrors(newErrors);
     return Object.keys(newErrors).length === 0;
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
+  const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
-    setErrors({});
     if (!validateForm()) return;
 
-    setIsSubmitting(true);
-    const phoneValidation = validateCameroonPhone(phone);
+    const cleanNom = nettoyerTexte(nom, 60);
+    const phoneVal = validateCameroonPhone(telephone);
+    const cleanPhone = phoneVal.isValid ? phoneVal.formatted : telephone;
+    const finalHeure = allSlots.length > 0 ? heure : heureManuelle;
+    const cleanOccasion = occasion !== 'Repas classique' ? nettoyerTexte(occasion, 60) : '';
+    const cleanDemandes = nettoyerTexte(demandes, 300, { multiligne: true });
 
-    const reservation: ReservationData = {
-      reservationNumber: generateReservationNumber(),
-      clientName: name.trim(),
-      clientPhone: phoneValidation.formatted || phone.trim(),
-      clientEmail: email.trim() || undefined,
-      date,
-      heure,
-      personnes,
-      occasion: occasion || undefined,
-      demandes: demandes.trim() || undefined,
-      dateCreation: new Date().toISOString()
-    };
+    // Formatage de la date en français (ex. 12 novembre 2026)
+    const [y, m, d] = date.split('-');
+    const dateFormatee = `${d}/${m}/${y}`;
 
-    const res = await saveReservation(reservation);
-    setIsSubmitting(false);
+    // Message sans emoji selon Bloc D.6
+    const lignes: (string | null)[] = [
+      `Bonjour, je souhaite réserver une table pour ${personnes} personne${personnes > 1 ? 's' : ''} le ${dateFormatee} à ${finalHeure}.`,
+      `Nom : ${cleanNom}`,
+      `Téléphone : ${cleanPhone}`,
+      cleanOccasion ? `Occasion : ${cleanOccasion}` : null,
+      cleanDemandes ? `Demandes particulières : ${cleanDemandes}` : null,
+      'Merci de me confirmer la disponibilité.'
+    ];
 
-    if (res.success) {
-      setConfirmedReservation(reservation);
-    } else {
-      setErrors({ general: res.error || 'Erreur lors de la réservation.' });
+    const message = lignes.filter(Boolean).join('\n');
+    setPreparedMessage(message);
+
+    const isTooLong = isWhatsAppUrlTooLong(message);
+    const fullUrl = buildWhatsAppUrl(message);
+    const simpleUrl = buildSimpleWhatsAppUrl();
+
+    if (isTooLong) {
+      if (simpleUrl) openWhatsApp(simpleUrl);
+    } else if (fullUrl) {
+      openWhatsApp(fullUrl);
     }
+
+    setIsSubmitted(true);
   };
 
-  const handleReset = () => {
-    setConfirmedReservation(null);
-    setName('');
-    setPhone('');
-    setEmail('');
-    setDemandes('');
-    setPersonnes(2);
-    setOccasion(RESERVATION_SETTINGS.occasions[0]);
+  const handleCopy = async () => {
+    if (!preparedMessage) return;
+    try {
+      await navigator.clipboard.writeText(preparedMessage);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2500);
+    } catch {
+      // Fallback
+    }
   };
 
   return (
     <section
-      id="reserver"
+      id="reservation"
       aria-label="Réserver une table"
       className="scroll-mt-16 py-14 px-4 sm:px-6 bg-[#FBF6EE] text-[#2B1A12] border-t border-[#EADFCF]"
     >
-      <div className="max-w-4xl mx-auto space-y-8">
-        {/* En-tête de section */}
+      {/* Ancre de compatibilité #reserver */}
+      <div id="reserver" className="sr-only" />
+
+      <div className="max-w-3xl mx-auto space-y-8">
+        {/* En-tête */}
         <div className="text-center max-w-xl mx-auto space-y-2">
           <div className="inline-block">
             <span className="text-xs font-semibold text-[#A84A15] bg-[#F0E6D8] px-3.5 py-1 rounded-full border border-[#EADFCF]">
-              Table & Convivialité
+              Accueil & Réservation
             </span>
           </div>
-          <h2 className="text-3xl sm:text-4xl font-serif font-bold tracking-tight text-[#2B1A12]">
+          <h2 className="text-3xl sm:text-4xl font-serif font-bold text-[#2B1A12] tracking-tight">
             Réserver une table
           </h2>
-          <p className="text-xs sm:text-sm text-[#6B5446]">
-            Partagez un moment d'exception au cœur de Bonapriso. Réservation confirmée instantanément avec envoi WhatsApp.
+          <p className="text-xs sm:text-sm text-[#6B5446] leading-relaxed">
+            Envoyez votre demande sur WhatsApp. La table n'est réservée qu'après confirmation du restaurant.
           </p>
         </div>
 
-        {/* Cadre principal */}
-        <div className="bg-[#F0E6D8]/60 border border-[#EADFCF] rounded-2xl p-5 sm:p-8 shadow-sm max-w-2xl mx-auto">
-          {confirmedReservation ? (
-            <div className="text-center space-y-6 py-4">
-              <div className="w-16 h-16 rounded-full bg-emerald-100 text-emerald-700 mx-auto flex items-center justify-center border border-emerald-200">
-                <CheckCircle2 className="w-9 h-9" />
-              </div>
+        {isSubmitted ? (
+          /* Confirmation d'envoi */
+          <div className="p-6 sm:p-8 rounded-2xl bg-white border border-[#EADFCF] shadow-sm text-center space-y-5">
+            <div className="w-14 h-14 rounded-full bg-[#F0E6D8] border border-[#EADFCF] flex items-center justify-center mx-auto text-[#A84A15]">
+              <Send className="w-7 h-7" />
+            </div>
 
-              <div className="space-y-1">
-                <h3 className="text-2xl font-serif font-bold text-[#2B1A12]">
-                  Votre table est pré-réservée !
-                </h3>
-                <p className="text-xs sm:text-sm text-[#6B5446]">
-                  Référence : <span className="font-bold text-[#A84A15]">{confirmedReservation.reservationNumber}</span>
-                </p>
-              </div>
+            <div className="space-y-2">
+              <h3 className="font-serif font-bold text-xl text-[#2B1A12]">
+                Votre demande est prête dans WhatsApp
+              </h3>
+              <p className="text-xs sm:text-sm text-[#6B5446] max-w-md mx-auto leading-relaxed">
+                Il reste une étape : envoyez le message pré-rempli dans l'application WhatsApp. La réservation sera effective dès réception de la réponse du restaurant.
+              </p>
+            </div>
 
-              {/* Fiche récapitulative */}
-              <div className="bg-white border border-[#EADFCF] rounded-xl p-4 sm:p-5 text-left text-xs sm:text-sm space-y-2.5 shadow-2xs">
-                <div className="flex justify-between border-b border-[#EADFCF] pb-2">
-                  <span className="text-[#6B5446]">Nom :</span>
-                  <span className="font-semibold text-[#2B1A12]">{confirmedReservation.clientName}</span>
-                </div>
-                <div className="flex justify-between border-b border-[#EADFCF] pb-2">
-                  <span className="text-[#6B5446]">Téléphone :</span>
-                  <span className="font-semibold text-[#2B1A12]">{confirmedReservation.clientPhone}</span>
-                </div>
-                <div className="flex justify-between border-b border-[#EADFCF] pb-2">
-                  <span className="text-[#6B5446]">Date & Heure :</span>
-                  <span className="font-semibold text-[#A84A15]">
-                    {confirmedReservation.date} à {confirmedReservation.heure}
-                  </span>
-                </div>
-                <div className="flex justify-between border-b border-[#EADFCF] pb-2">
-                  <span className="text-[#6B5446]">Couverts :</span>
-                  <span className="font-semibold text-[#2B1A12]">
-                    {confirmedReservation.personnes} personne{confirmedReservation.personnes > 1 ? 's' : ''}
-                  </span>
-                </div>
-                {confirmedReservation.occasion && (
-                  <div className="flex justify-between border-b border-[#EADFCF] pb-2">
-                    <span className="text-[#6B5446]">Occasion :</span>
-                    <span className="font-semibold text-[#2B1A12]">{confirmedReservation.occasion}</span>
-                  </div>
-                )}
-                {confirmedReservation.demandes && (
-                  <div className="flex justify-between pt-1">
-                    <span className="text-[#6B5446]">Demandes :</span>
-                    <span className="font-medium text-[#2B1A12] italic">{confirmedReservation.demandes}</span>
-                  </div>
-                )}
-              </div>
-
-              {/* Action WhatsApp */}
-              <div className="space-y-3 pt-2">
-                <a
-                  href={generateWhatsAppReservationUrl(confirmedReservation)}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="w-full py-3.5 px-4 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white text-xs sm:text-sm font-bold inline-flex items-center justify-center gap-2 transition shadow-md"
+            {/* Aperçu du message */}
+            <div className="text-left space-y-1.5 max-w-md mx-auto">
+              <div className="flex justify-between items-center text-xs font-semibold text-[#6B5446]">
+                <span>Texte du message :</span>
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="text-[#A84A15] hover:underline inline-flex items-center gap-1 cursor-pointer"
                 >
-                  <Send className="w-4 h-4" />
-                  <span>Confirmer la réservation sur WhatsApp</span>
-                </a>
+                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
+                  <span>{copied ? 'Copié !' : 'Copier'}</span>
+                </button>
+              </div>
+              <pre className="p-3 bg-[#FBF6EE] rounded-lg border border-[#D9C8B4] text-[11px] text-[#2B1A12] whitespace-pre-wrap font-sans">
+                {preparedMessage}
+              </pre>
+            </div>
 
-                <p className="text-[11px] text-[#6B5446]">
-                  Assistance téléphonique et WhatsApp direct : {RESTAURANT_WHATSAPP_DISPLAY}
-                </p>
+            {/* 3 Secours visibles (Bloc B.4) */}
+            <div className="p-4 rounded-xl bg-[#F0E6D8]/70 border border-[#EADFCF] space-y-3 max-w-md mx-auto text-left">
+              <div className="text-xs font-bold text-[#2B1A12]">Options de secours :</div>
+              <div className="flex flex-col gap-2">
+                <button
+                  type="button"
+                  onClick={handleCopy}
+                  className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition cursor-pointer"
+                >
+                  <Copy className="w-3.5 h-3.5 text-[#A84A15]" />
+                  <span>{copied ? 'Message copié !' : 'Copier le message'}</span>
+                </button>
 
                 <button
                   type="button"
-                  onClick={handleReset}
-                  className="px-5 py-2 text-xs font-semibold text-[#6B5446] hover:text-[#2B1A12] underline transition"
+                  onClick={() => {
+                    const url = buildWhatsAppUrl(preparedMessage) || buildSimpleWhatsAppUrl();
+                    if (url) openWhatsApp(url);
+                  }}
+                  className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition cursor-pointer"
                 >
-                  Effectuer une autre réservation
+                  <ExternalLink className="w-3.5 h-3.5 text-[#A84A15]" />
+                  <span>Ouvrir WhatsApp</span>
                 </button>
+
+                <a
+                  href={`tel:${telRestaurantDigits}`}
+                  className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition text-center"
+                >
+                  <Phone className="w-3.5 h-3.5 text-[#A84A15]" />
+                  <span>Appeler le {RESTAURANT_WHATSAPP_DISPLAY}</span>
+                </a>
               </div>
             </div>
-          ) : (
-            <form onSubmit={handleSubmit} className="space-y-5 text-xs sm:text-sm">
-              {errors.general && (
-                <div className="p-3 rounded-lg bg-red-50 border border-red-200 text-red-700 text-xs flex items-center gap-2">
-                  <AlertCircle className="w-4 h-4 shrink-0" />
-                  <span>{errors.general}</span>
+
+            <div className="pt-2">
+              <button
+                type="button"
+                onClick={() => setIsSubmitted(false)}
+                className="text-xs text-[#6B5446] hover:text-[#2B1A12] underline cursor-pointer"
+              >
+                ← Faire une autre demande de réservation
+              </button>
+            </div>
+          </div>
+        ) : (
+          /* Formulaire de réservation */
+          <form
+            onSubmit={handleSubmit}
+            className="p-6 sm:p-8 rounded-2xl bg-white border border-[#EADFCF] shadow-sm space-y-6"
+          >
+            {/* Ligne Nom & Téléphone */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label htmlFor="res-nom" className="block text-xs font-bold uppercase tracking-wider text-[#2B1A12]">
+                  Nom complet *
+                </label>
+                <input
+                  id="res-nom"
+                  type="text"
+                  maxLength={60}
+                  required
+                  value={nom}
+                  onChange={e => setNom(e.target.value)}
+                  placeholder="Ex. Christian Mbida"
+                  aria-invalid={Boolean(errors.nom)}
+                  aria-describedby={errors.nom ? 'res-nom-err' : undefined}
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-xs sm:text-sm text-[#2B1A12] placeholder-[#8C7565] focus:outline-none focus:border-[#A84A15] transition"
+                />
+                {errors.nom && (
+                  <p id="res-nom-err" role="alert" className="text-[11px] text-red-600 font-medium">
+                    {errors.nom}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="res-tel" className="block text-xs font-bold uppercase tracking-wider text-[#2B1A12]">
+                  Téléphone (Cameroun) *
+                </label>
+                <input
+                  id="res-tel"
+                  type="tel"
+                  maxLength={20}
+                  required
+                  value={telephone}
+                  onChange={e => setTelephone(e.target.value)}
+                  placeholder="Ex. 6 99 93 17 21"
+                  aria-invalid={Boolean(errors.telephone)}
+                  aria-describedby={errors.telephone ? 'res-tel-err' : undefined}
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-xs sm:text-sm text-[#2B1A12] placeholder-[#8C7565] focus:outline-none focus:border-[#A84A15] transition"
+                />
+                {errors.telephone && (
+                  <p id="res-tel-err" role="alert" className="text-[11px] text-red-600 font-medium">
+                    {errors.telephone}
+                  </p>
+                )}
+              </div>
+            </div>
+
+            {/* Ligne Date & Nombre de couverts */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label htmlFor="res-date" className="block text-xs font-bold uppercase tracking-wider text-[#2B1A12]">
+                  Date de réservation *
+                </label>
+                <input
+                  id="res-date"
+                  type="date"
+                  required
+                  min={todayIso}
+                  max={maxDateIso}
+                  value={date}
+                  onChange={e => setDate(e.target.value)}
+                  aria-invalid={Boolean(errors.date)}
+                  aria-describedby={errors.date ? 'res-date-err' : undefined}
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-xs sm:text-sm text-[#2B1A12] focus:outline-none focus:border-[#A84A15] transition"
+                />
+                {errors.date && (
+                  <p id="res-date-err" role="alert" className="text-[11px] text-red-600 font-medium">
+                    {errors.date}
+                  </p>
+                )}
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="res-personnes" className="block text-xs font-bold uppercase tracking-wider text-[#2B1A12]">
+                  Nombre de personnes (1 à 12) *
+                </label>
+                <select
+                  id="res-personnes"
+                  value={personnes}
+                  onChange={e => setPersonnes(Number(e.target.value))}
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-xs sm:text-sm text-[#2B1A12] focus:outline-none focus:border-[#A84A15] transition"
+                >
+                  {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12].map(n => (
+                    <option key={n} value={n}>
+                      {n} personne{n > 1 ? 's' : ''}
+                    </option>
+                  ))}
+                </select>
+                <p className="text-[11px] text-[#6B5446] pt-0.5">
+                  Au-delà de 12 personnes,{' '}
+                  <a href={`tel:${telRestaurantDigits}`} className="text-[#A84A15] underline font-semibold">
+                    appelez-nous au {lieu.telephone}
+                  </a>.
+                </p>
+              </div>
+            </div>
+
+            {/* Heure / Créneaux */}
+            <div className="space-y-2">
+              <label className="block text-xs font-bold uppercase tracking-wider text-[#2B1A12]">
+                Heure de réservation *
+              </label>
+
+              {allSlots.length > 0 ? (
+                availableSlots.length > 0 ? (
+                  <div className="grid grid-cols-4 sm:grid-cols-6 md:grid-cols-8 gap-2">
+                    {availableSlots.map(s => {
+                      const isSelected = heure === s;
+                      return (
+                        <button
+                          key={s}
+                          type="button"
+                          onClick={() => setHeure(s)}
+                          className={`py-2 px-1 text-xs rounded-lg border font-semibold tabular-nums transition cursor-pointer ${
+                            isSelected
+                              ? 'bg-[#A84A15] text-white border-[#A84A15]'
+                              : 'bg-white text-[#2B1A12] border-[#D9C8B4] hover:bg-[#F0E6D8]'
+                          }`}
+                        >
+                          {s}
+                        </button>
+                      );
+                    })}
+                  </div>
+                ) : (
+                  <p className="text-xs text-amber-800 bg-amber-50 p-3 rounded-lg border border-amber-200">
+                    Aucun créneau disponible pour aujourd'hui (fermeture proche ou délai de 60 minutes). Veuillez choisir une autre date ou{' '}
+                    <a href={`tel:${telRestaurantDigits}`} className="font-bold underline">
+                      appeler le restaurant
+                    </a>.
+                  </p>
+                )
+              ) : (
+                <div>
+                  <input
+                    type="time"
+                    required
+                    value={heureManuelle}
+                    onChange={e => setHeureManuelle(e.target.value)}
+                    className="w-full sm:w-48 px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-xs sm:text-sm text-[#2B1A12] focus:outline-none focus:border-[#A84A15]"
+                  />
                 </div>
               )}
+              {errors.heure && (
+                <p role="alert" className="text-[11px] text-red-600 font-medium">
+                  {errors.heure}
+                </p>
+              )}
+            </div>
 
-              {/* 1. Ligne Nom et Téléphone */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-[#6B5446] mb-1 flex items-center gap-1">
-                    <User className="w-3.5 h-3.5 text-[#A84A15]" />
-                    <span>Nom complet <span className="text-[#A84A15]">*</span></span>
-                  </label>
-                  <input
-                    type="text"
-                    required
-                    value={name}
-                    onChange={e => setName(e.target.value)}
-                    placeholder="Ex. Emmanuel Eto'o"
-                    className={`w-full px-3.5 py-2.5 rounded-lg bg-white border ${
-                      errors.name ? 'border-red-500' : 'border-[#D9C8B4]'
-                    } text-[#2B1A12] text-xs focus:outline-none focus:border-[#A84A15] transition`}
-                  />
-                  {errors.name && <p className="text-[11px] text-red-600 mt-1">{errors.name}</p>}
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-[#6B5446] mb-1 flex items-center gap-1">
-                    <Phone className="w-3.5 h-3.5 text-[#A84A15]" />
-                    <span>Téléphone (+237 Cameroun) <span className="text-[#A84A15]">*</span></span>
-                  </label>
-                  <input
-                    type="tel"
-                    required
-                    value={phone}
-                    onChange={e => setPhone(e.target.value)}
-                    placeholder="Ex. 699 93 17 21"
-                    className={`w-full px-3.5 py-2.5 rounded-lg bg-white border ${
-                      errors.phone ? 'border-red-500' : 'border-[#D9C8B4]'
-                    } text-[#2B1A12] text-xs focus:outline-none focus:border-[#A84A15] transition`}
-                  />
-                  {errors.phone ? (
-                    <p className="text-[11px] text-red-600 mt-1">{errors.phone}</p>
-                  ) : (
-                    <p className="text-[10px] text-[#6B5446] mt-0.5">Pour confirmation de disponibilité</p>
-                  )}
-                </div>
-              </div>
-
-              {/* 2. Email (optionnel) et Nombre de personnes */}
-              <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                <div>
-                  <label className="block text-xs font-medium text-[#6B5446] mb-1 flex items-center gap-1">
-                    <Mail className="w-3.5 h-3.5 text-[#A84A15]" />
-                    <span>Email (facultatif)</span>
-                  </label>
-                  <input
-                    type="email"
-                    value={email}
-                    onChange={e => setEmail(e.target.value)}
-                    placeholder="contact@exemple.cm"
-                    className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-[#2B1A12] text-xs focus:outline-none focus:border-[#A84A15] transition"
-                  />
-                </div>
-
-                <div>
-                  <label className="block text-xs font-medium text-[#6B5446] mb-1 flex items-center gap-1">
-                    <Users className="w-3.5 h-3.5 text-[#A84A15]" />
-                    <span>Nombre de personnes (1 à 12) <span className="text-[#A84A15]">*</span></span>
-                  </label>
-                  <div className="flex items-center gap-2">
-                    <input
-                      type="range"
-                      min={RESERVATION_SETTINGS.minPersonnes}
-                      max={RESERVATION_SETTINGS.maxPersonnes}
-                      value={personnes}
-                      onChange={e => setPersonnes(parseInt(e.target.value, 10))}
-                      className="flex-1 accent-[#A84A15]"
-                    />
-                    <span className="w-12 text-center font-serif font-bold text-sm bg-white border border-[#D9C8B4] py-1.5 rounded-lg">
-                      {personnes}
-                    </span>
-                  </div>
-                </div>
-              </div>
-
-              {/* 3. Date et Créneaux horaires */}
-              <div className="space-y-3 pt-2 border-t border-[#EADFCF]">
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
-                    <label className="block text-xs font-medium text-[#6B5446] mb-1 flex items-center gap-1">
-                      <Calendar className="w-3.5 h-3.5 text-[#A84A15]" />
-                      <span>Date de réservation <span className="text-[#A84A15]">*</span></span>
-                    </label>
-                    <input
-                      type="date"
-                      required
-                      min={todayIso}
-                      value={date}
-                      onChange={e => setDate(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-[#2B1A12] text-xs focus:outline-none focus:border-[#A84A15]"
-                    />
-                  </div>
-
-                  <div>
-                    <label className="block text-xs font-medium text-[#6B5446] mb-1 flex items-center gap-1">
-                      <Sparkles className="w-3.5 h-3.5 text-[#A84A15]" />
-                      <span>Occasion particulière</span>
-                    </label>
-                    <select
-                      value={occasion}
-                      onChange={e => setOccasion(e.target.value)}
-                      className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-[#2B1A12] text-xs focus:outline-none focus:border-[#A84A15]"
-                    >
-                      {RESERVATION_SETTINGS.occasions.map(occ => (
-                        <option key={occ} value={occ}>
-                          {occ}
-                        </option>
-                      ))}
-                    </select>
-                  </div>
-                </div>
-
-                {/* Sélecteur de créneaux Midi / Soir */}
-                <div>
-                  <label className="block text-xs font-medium text-[#6B5446] mb-2 flex items-center gap-1">
-                    <Clock className="w-3.5 h-3.5 text-[#A84A15]" />
-                    <span>Créneau horaire souhaité <span className="text-[#A84A15]">*</span></span>
-                  </label>
-
-                  <div className="space-y-2">
-                    <div>
-                      <span className="text-[11px] font-semibold text-[#6B5446] uppercase tracking-wider block mb-1.5">
-                        Service du Déjeuner
-                      </span>
-                      <div className="grid grid-cols-3 sm:grid-cols-6 gap-2">
-                        {RESERVATION_SETTINGS.creneauxMidi.map(slot => {
-                          const { available } = checkSlotAvailability(date, slot);
-                          const isSelected = heure === slot;
-                          return (
-                            <button
-                              type="button"
-                              key={slot}
-                              disabled={!available}
-                              onClick={() => setHeure(slot)}
-                              className={`py-2 px-1 rounded-lg text-xs font-medium border text-center transition ${
-                                isSelected
-                                  ? 'bg-[#A84A15] text-white border-[#A84A15] font-bold shadow-xs'
-                                  : available
-                                  ? 'bg-white text-[#2B1A12] border-[#D9C8B4] hover:bg-[#F0E6D8]'
-                                  : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed line-through'
-                              }`}
-                            >
-                              {slot}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-
-                    <div>
-                      <span className="text-[11px] font-semibold text-[#6B5446] uppercase tracking-wider block mb-1.5">
-                        Service du Dîner
-                      </span>
-                      <div className="grid grid-cols-3 sm:grid-cols-7 gap-2">
-                        {RESERVATION_SETTINGS.creneauxSoir.map(slot => {
-                          const { available } = checkSlotAvailability(date, slot);
-                          const isSelected = heure === slot;
-                          return (
-                            <button
-                              type="button"
-                              key={slot}
-                              disabled={!available}
-                              onClick={() => setHeure(slot)}
-                              className={`py-2 px-1 rounded-lg text-xs font-medium border text-center transition ${
-                                isSelected
-                                  ? 'bg-[#A84A15] text-white border-[#A84A15] font-bold shadow-xs'
-                                  : available
-                                  ? 'bg-white text-[#2B1A12] border-[#D9C8B4] hover:bg-[#F0E6D8]'
-                                  : 'bg-gray-100 text-gray-400 border-gray-200 cursor-not-allowed line-through'
-                              }`}
-                            >
-                              {slot}
-                            </button>
-                          );
-                        })}
-                      </div>
-                    </div>
-                  </div>
-                </div>
-              </div>
-
-              {/* 4. Demandes particulières */}
-              <div className="pt-2 border-t border-[#EADFCF]">
-                <label className="block text-xs font-medium text-[#6B5446] mb-1 flex items-center gap-1">
-                  <MessageSquare className="w-3.5 h-3.5 text-[#A84A15]" />
-                  <span>Demandes particulières (table en terrasse, allergies, etc.)</span>
+            {/* Occasion & Demandes */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
+              <div className="space-y-1">
+                <label htmlFor="res-occasion" className="block text-xs font-bold uppercase tracking-wider text-[#2B1A12]">
+                  Occasion (facultatif)
                 </label>
-                <textarea
-                  rows={2}
+                <select
+                  id="res-occasion"
+                  value={occasion}
+                  onChange={e => setOccasion(e.target.value)}
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-xs sm:text-sm text-[#2B1A12] focus:outline-none focus:border-[#A84A15] transition"
+                >
+                  {RESERVATION_SETTINGS.occasions.map(occ => (
+                    <option key={occ} value={occ}>
+                      {occ}
+                    </option>
+                  ))}
+                </select>
+              </div>
+
+              <div className="space-y-1">
+                <label htmlFor="res-demandes" className="block text-xs font-bold uppercase tracking-wider text-[#2B1A12]">
+                  Demandes particulières (facultatif)
+                </label>
+                <input
+                  id="res-demandes"
+                  type="text"
+                  maxLength={300}
                   value={demandes}
                   onChange={e => setDemandes(e.target.value)}
-                  placeholder="Ex. Préférence pour une table calme, anniversaire surprise, chaise haute..."
-                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-[#2B1A12] text-xs focus:outline-none focus:border-[#A84A15]"
+                  placeholder="Ex. table en terrasse, chaise bébé..."
+                  className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-xs sm:text-sm text-[#2B1A12] placeholder-[#8C7565] focus:outline-none focus:border-[#A84A15] transition"
                 />
               </div>
+            </div>
 
-              {/* Bouton de confirmation */}
-              <div className="pt-2">
+            {/* Renvoi confidentialité */}
+            <p className="text-[11px] text-[#6B5446]">
+              Vos coordonnées servent uniquement à préparer le message WhatsApp.{' '}
+              {onOpenPrivacy && (
                 <button
-                  type="submit"
-                  disabled={isSubmitting}
-                  className="w-full py-3.5 px-4 rounded-xl bg-[#A84A15] hover:bg-[#8D3C0F] text-white text-xs sm:text-sm font-bold flex items-center justify-center gap-2 transition shadow-sm cursor-pointer disabled:opacity-50"
+                  type="button"
+                  onClick={onOpenPrivacy}
+                  className="text-[#A84A15] underline cursor-pointer"
                 >
-                  <Calendar className="w-4 h-4" />
-                  <span>{isSubmitting ? 'Validation...' : 'Valider la réservation'}</span>
+                  Consultez notre politique de confidentialité
                 </button>
-              </div>
-            </form>
-          )}
-        </div>
+              )}
+            </p>
+
+            {/* Bouton d'action */}
+            <div className="pt-2">
+              <button
+                type="submit"
+                className="w-full py-3.5 px-6 rounded-xl bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
+              >
+                <Send className="w-4 h-4" />
+                <span>Envoyer ma demande sur WhatsApp</span>
+              </button>
+            </div>
+          </form>
+        )}
       </div>
     </section>
   );

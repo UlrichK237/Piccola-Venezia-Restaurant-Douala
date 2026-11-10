@@ -4,11 +4,8 @@ import { RESTAURANT_DATA, Plat, CategorieMenu } from '../data/restaurantData';
 import corrections from '../data/corrections.json';
 import platPhotosData from '../data/platPhotos.json';
 import { PlatModal, PlatPhotoInfo } from './PlatModal';
+import { OptionModal } from './OptionModal';
 import { useCart } from '../context/CartContext';
-
-interface MenuSectionProps {
-  onSelectPlat?: (plat: Plat) => void;
-}
 
 /**
  * Normalise une chaîne pour une recherche insensible à la casse et aux accents.
@@ -77,8 +74,8 @@ const getCategorySlug = (catName: string): string => {
   return 'cat-' + catName.toLowerCase().replace(/[^a-z0-9]/g, '-');
 };
 
-export const MenuSection: React.FC<MenuSectionProps> = () => {
-  const { addItem, updateQuantity, getItemQuantity } = useCart();
+export const MenuSection: React.FC = () => {
+  const { items, addItem, updateQuantity } = useCart();
   const [searchQuery, setSearchQuery] = useState('');
   const [activeCategory, setActiveCategory] = useState<string>('');
   const [showScrollTop, setShowScrollTop] = useState(false);
@@ -89,7 +86,47 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
   const [selectedModalPhoto, setSelectedModalPhoto] = useState<PlatPhotoInfo | null>(null);
   const activeTriggerRef = useRef<HTMLButtonElement | null>(null);
 
+  // Gestion de la modale d'options de plat
+  const [selectedOptionPlat, setSelectedOptionPlat] = useState<{ plat: Plat; categorie: string } | null>(null);
+  const [isOptionOpen, setIsOptionOpen] = useState(false);
+  const optionTriggerRef = useRef<HTMLButtonElement | null>(null);
+
   const platPhotosMap = platPhotosData as Record<string, PlatPhotoInfo>;
+
+  const platNeedsOptionModal = (p: Plat): boolean => {
+    if (p.options && p.options.length > 0) return true;
+    if (
+      p.description &&
+      (p.description.toLowerCase().includes('au choix') ||
+        p.description.toLowerCase().includes('du jour'))
+    ) {
+      return true;
+    }
+    return false;
+  };
+
+  const handleAddPlat = (plat: Plat, categorie: string, triggerBtn?: HTMLButtonElement | null) => {
+    if (platNeedsOptionModal(plat)) {
+      optionTriggerRef.current = triggerBtn || null;
+      setSelectedOptionPlat({ plat, categorie });
+      setIsOptionOpen(true);
+    } else {
+      addItem(plat, categorie);
+    }
+  };
+
+  const handleMinusPlat = (platId: string) => {
+    let lastIdx = -1;
+    for (let i = items.length - 1; i >= 0; i--) {
+      if (items[i].id === platId) {
+        lastIdx = i;
+        break;
+      }
+    }
+    if (lastIdx >= 0) {
+      updateQuantity(lastIdx, -1);
+    }
+  };
 
   const menuCategories = RESTAURANT_DATA.menu;
 
@@ -391,7 +428,10 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
 
                         {/* Barre d'action Panier : Bouton Ajouter au panier & Sélecteur de quantité (+ / −) */}
                         {(() => {
-                          const currentQty = getItemQuantity(photoKey);
+                          const currentQty = items
+                            .filter(it => it.id === photoKey)
+                            .reduce((sum, it) => sum + it.quantite, 0);
+
                           return (
                             <div className="mt-2.5 pt-2 border-t border-[#EADFCF]/60 flex items-center justify-between gap-2">
                               <span className="text-[11px] text-[#6B5446]">
@@ -409,17 +449,7 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
                                 {currentQty === 0 ? (
                                   <button
                                     type="button"
-                                    onClick={() =>
-                                      addItem(
-                                        {
-                                          nom: plat.nom,
-                                          categorie: cat.categorie,
-                                          prix: plat.prix,
-                                          image: photoInfo?.fichier
-                                        },
-                                        1
-                                      )
-                                    }
+                                    onClick={e => handleAddPlat(plat, cat.categorie, e.currentTarget)}
                                     aria-label={`Ajouter ${correctedNom} au panier`}
                                     className="px-3 py-1.5 rounded-lg bg-[#EB7F36]/20 hover:bg-[#EB7F36] text-[#2B1A12] text-xs font-semibold inline-flex items-center gap-1.5 transition border border-[#EB7F36]/40 cursor-pointer shadow-2xs hover:scale-102 active:scale-98"
                                   >
@@ -430,7 +460,7 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
                                   <div className="inline-flex items-center rounded-lg border border-[#EB7F36] bg-white overflow-hidden shadow-2xs">
                                     <button
                                       type="button"
-                                      onClick={() => updateQuantity(photoKey, -1)}
+                                      onClick={() => handleMinusPlat(photoKey)}
                                       aria-label={`Diminuer la quantité de ${correctedNom}`}
                                       className="p-1 px-2.5 text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8] transition cursor-pointer"
                                     >
@@ -441,8 +471,8 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
                                     </span>
                                     <button
                                       type="button"
-                                      onClick={() => updateQuantity(photoKey, 1)}
-                                      aria-label={`Augmenter la quantité de ${correctedNom}`}
+                                      onClick={e => handleAddPlat(plat, cat.categorie, e.currentTarget)}
+                                      aria-label={`Ajouter ${correctedNom}`}
                                       className="p-1 px-2.5 text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8] transition cursor-pointer"
                                     >
                                       <Plus className="w-3 h-3" />
@@ -474,7 +504,7 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
           type="button"
           onClick={scrollToTopMenu}
           aria-label="Retourner en haut du menu"
-          className="fixed bottom-6 right-6 z-30 p-3 rounded-full bg-white border border-[#D9C8B4] text-[#A84A15] shadow-md hover:bg-[#F0E6D8] transition min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[#A84A15] focus-visible:outline-none"
+          className="fixed bottom-5 left-4 sm:left-6 z-30 p-3 rounded-full bg-white border border-[#D9C8B4] text-[#A84A15] shadow-md hover:bg-[#F0E6D8] transition min-w-[44px] min-h-[44px] flex items-center justify-center focus-visible:ring-2 focus-visible:ring-[#A84A15] focus-visible:outline-none cursor-pointer"
         >
           <ArrowUp className="w-5 h-5" aria-hidden="true" />
         </button>
@@ -490,6 +520,23 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
         plat={selectedModalPlat}
         photoInfo={selectedModalPhoto}
         triggerRef={activeTriggerRef}
+      />
+
+      {/* Modale de choix d'options pour les plats */}
+      <OptionModal
+        isOpen={isOptionOpen}
+        onClose={() => {
+          setIsOptionOpen(false);
+          setSelectedOptionPlat(null);
+        }}
+        plat={selectedOptionPlat?.plat || null}
+        categorie={selectedOptionPlat?.categorie || ''}
+        triggerRef={optionTriggerRef}
+        onConfirm={(options, remarque) => {
+          if (selectedOptionPlat) {
+            addItem(selectedOptionPlat.plat, selectedOptionPlat.categorie, options, remarque, 1);
+          }
+        }}
       />
     </section>
   );

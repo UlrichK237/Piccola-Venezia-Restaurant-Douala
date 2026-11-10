@@ -1,23 +1,17 @@
 import React, { useState } from 'react';
-import { Menu, X, Phone, ShoppingBag, Calendar } from 'lucide-react';
+import { Menu, X, Phone, ShoppingBag } from 'lucide-react';
 import { RESTAURANT_DATA } from '../data/restaurantData';
-import { MODE_DEMO, BANDEAU_DEMO_HAUT } from '../config';
 import { useCart } from '../context/CartContext';
+import { getPhoneDigits } from '../lib/securite';
 
 export const Navbar: React.FC = () => {
   const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const { totalItemsCount, openCart } = useCart();
   const lieu = RESTAURANT_DATA.lieux[0];
+  const telDigits = getPhoneDigits(lieu.telephone);
 
   return (
     <header className="sticky top-0 z-40 w-full bg-[#EB7F36] border-b border-[#EADFCF]">
-      {/* Bandeau discret et fixe (affiché uniquement si MODE_DEMO et BANDEAU_DEMO_HAUT sont vrais) */}
-      {MODE_DEMO && BANDEAU_DEMO_HAUT && (
-        <div className="bg-[#EB7F36] text-[#2B1A12] px-4 py-1.5 text-center text-xs font-medium border-b border-[#D76E27]">
-          Maquette de démonstration, non officielle
-        </div>
-      )}
-
       {/* Barre Principale */}
       <div className="max-w-4xl mx-auto px-4 py-3 flex items-center justify-between">
         {/* Dans l'en-tête, le logo suffit (max 200px) */}
@@ -34,7 +28,7 @@ export const Navbar: React.FC = () => {
           <a href="#menu" className="hover:text-[#A84A15] font-medium transition">
             Menu
           </a>
-          <a href="#reserver" className="hover:text-[#A84A15] font-medium transition flex items-center gap-1">
+          <a href="#reservation" className="hover:text-[#A84A15] font-medium transition">
             Réserver
           </a>
           <a href="#infos" className="hover:text-[#A84A15] font-medium transition">
@@ -63,10 +57,10 @@ export const Navbar: React.FC = () => {
             )}
           </button>
 
-          {/* Bouton Appeler (bouton plein en #A84A15 avec texte blanc) */}
+          {/* Bouton Appeler */}
           <div className="hidden sm:flex items-center">
             <a
-              href={`tel:${lieu.telephone}`}
+              href={`tel:${telDigits}`}
               className="px-4 py-2 rounded-lg bg-[#A84A15] hover:bg-[#8D3C0F] text-white text-xs font-semibold inline-flex items-center gap-1.5 transition shadow-2xs"
             >
               <Phone className="w-3.5 h-3.5" aria-hidden="true" />
@@ -79,7 +73,7 @@ export const Navbar: React.FC = () => {
             <button
               onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
               aria-label={mobileMenuOpen ? 'Fermer le menu' : 'Ouvrir le menu'}
-              className="p-2 text-[#2B1A12] hover:bg-[#EFE5D6] rounded-lg transition"
+              className="p-2 text-[#2B1A12] hover:bg-[#EFE5D6] rounded-lg transition cursor-pointer"
             >
               {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
             </button>
@@ -98,7 +92,7 @@ export const Navbar: React.FC = () => {
             Menu
           </a>
           <a
-            href="#reserver"
+            href="#reservation"
             onClick={() => setMobileMenuOpen(false)}
             className="block py-2 border-b border-[#EADFCF] hover:text-[#A84A15] font-semibold text-[#A84A15]"
           >
@@ -110,7 +104,7 @@ export const Navbar: React.FC = () => {
               setMobileMenuOpen(false);
               openCart();
             }}
-            className="w-full text-left py-2 border-b border-[#EADFCF] hover:text-[#A84A15] flex items-center justify-between"
+            className="w-full text-left py-2 border-b border-[#EADFCF] hover:text-[#A84A15] flex items-center justify-between cursor-pointer"
           >
             <span>Mon Panier</span>
             {totalItemsCount > 0 && (
@@ -134,7 +128,7 @@ export const Navbar: React.FC = () => {
             Contact
           </a>
           <a
-            href={`tel:${lieu.telephone}`}
+            href={`tel:${telDigits}`}
             className="inline-flex items-center gap-2 mt-2 px-4 py-2.5 rounded-lg bg-[#A84A15] text-white text-xs font-semibold"
           >
             <Phone className="w-3.5 h-3.5" />

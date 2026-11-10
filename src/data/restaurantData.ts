@@ -1,4 +1,6 @@
 
+import { RESTAURANT_WHATSAPP } from '../config';
+
 export interface Plat {
   id?: string;
   nom: string;
@@ -56,7 +58,7 @@ export const RESTAURANT_DATA: RestaurantData = {
       quartier: "Bonapriso",
       adresse: "Angle rue Njo Njo et rue Toyota, Bonapriso, Douala",
       telephone: "+237 6 99 93 17 21",
-      whatsapp: null,
+      whatsapp: RESTAURANT_WHATSAPP,
       horaires: "11:30 - 22:30",
       maps_url: "https://www.google.com/maps/search/?api=1&query=Piccola%20Venezia%20Restaurant,%20Douala"
     }

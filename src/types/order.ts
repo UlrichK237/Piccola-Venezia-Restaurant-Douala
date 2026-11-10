@@ -6,37 +6,29 @@ export interface CartItem {
   categorie: string;
   prix: number; // en FCFA
   quantite: number;
+  options?: string[];
+  remarque?: string;
   image?: string;
 }
 
-export type ModeReception = 'sur_place' | 'a_emporter' | 'livraison';
-export type ModePaiement = 'especes' | 'momo' | 'om';
+export type ModeReception = 'a_emporter' | 'livraison';
 
-export interface OrderData {
-  orderNumber: string; // Ex. "PV-20261110-4821"
-  clientName: string;
-  clientPhone: string;
+export interface OrderFormData {
+  nom: string;
+  telephone: string;
   modeReception: ModeReception;
   quartier?: string;
   adresse?: string;
-  notes?: string;
-  modePaiement: ModePaiement;
-  items: CartItem[];
-  sousTotal: number;
-  fraisLivraison: number;
-  total: number;
-  dateCreation: string; // ISO string
+  heureSouhaitee?: string;
+  remarquesGenerales?: string;
 }
 
-export interface ReservationData {
-  reservationNumber: string; // Ex. "RES-20261110-3914"
-  clientName: string;
-  clientPhone: string;
-  clientEmail?: string;
+export interface ReservationFormData {
+  nom: string;
+  telephone: string;
   date: string; // AAAA-MM-JJ
   heure: string; // HH:MM
   personnes: number;
   occasion?: string;
   demandes?: string;
-  dateCreation: string; // ISO string
 }
