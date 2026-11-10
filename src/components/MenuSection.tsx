@@ -397,7 +397,7 @@ export const MenuSection: React.FC<MenuSectionProps> = () => {
 
         {/* Pied de section : Mentions légales obligatoires */}
         <div className="pt-10 border-t border-[#EADFCF] text-center text-xs text-[#6B5446]">
-          <p>Prix indicatifs, à confirmer auprès du restaurant.</p>
+          <p></p>
         </div>
       </div>
 
