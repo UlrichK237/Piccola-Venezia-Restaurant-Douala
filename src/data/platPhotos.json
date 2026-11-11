@@ -521,15 +521,6 @@
     "requete": "Pizza with roasted eggplant, marinara, spicy breadcrumbs, parmigiana, basil - San Francisco, CA",
     "niveau": "approchant"
   },
-  "Le Pizze::Regina": {
-    "fichier": "/photos/plats/regina.jpg",
-    "auteur": "© Ra Boe / Wikipedia Create the proper attribution for your usage by clicking on this button! This file is licensed under the Creative Commons Attribution-Share Alike 3.0 Germany license.Attribution: Ra Boe / Wikipedia You are free: to share – to copy, distribute and transmit the work to remix – to adapt the work Under the following conditions: attribution – You must give appropriate credit, provide a link to the license, and indicate if changes were made. You may do so in any reasonable manner, but not in any way that suggests the licensor endorses you or your use. share alike – If you remix, transform, or build upon the material, you must distribute your contributions under the same or compatible license as the original.https://creativecommons.org/licenses/by-sa/3.0/de/deed.enCC BY-SA 3.0 deCreative Commons Attribution-Share Alike 3.0 detruetrue Internet: Titel Foto: Ra Boe / Wikipedia, Original; Lizenz: CC by-sa 3.0 Print: Titel Foto: Ra Boe / Wikipedia, Lizenz: CC by-sa 3.0 I have published this image as author Ra Boe under the \"CC-BY-SA-3.0\" in Wikipedia. This means that free, commercial usage outside of Wikipedia is permitted under the following licence terms: Online media: The author \" RaBoe/Wikipedia \" is named A weblink to the original image is provided: //commons.wikimedia.org/wiki/File:Pizza_prosciutto_e_funghi_(2010)_by_RaBoe.jpg A copy of, or the Uniform Resource Identifier (https://creativecommons.org/licenses/by-sa/3.0/de/legalcode) for, this License with every copy Print media: The author \" RaBoe/Wikipedia\" is named A copy of, or the Uniform Resource Identifier (https://creativecommons.org/licenses/by-sa/3.0/de/legalcode) for, this License with every copy Please send me a specimen copy or the URL of the website where the image is used. Please write an email to raboe001-at-web.de, if you need the image in a higher resolution need my postal address for sending a specimen copy have further questions about the terms of the licence PS: In case of refusal of the above terms the author reserves the right to take legal action. This license and the rights granted hereunder will terminate automatically upon any breach by you of the terms of this license. In this case the author reserves to demand declaration to cease and desist, and compensation (according to the MFM fee references currently in force). Any of the above conditions can be waived if you get permission from the copyright holder. Foto selbst aufgenommen mit Nikon-D50: Objektiv Tamron 18 - 250 mmvon Wikipedia-User: Ra Boe This photo was taken with an Nikon-D50:, Objective Tamron 18 - 250 mm by Wikipedia user: Ra Boe",
-    "licence": "CC BY-SA 3.0 de",
-    "licence_url": "https://creativecommons.org/licenses/by-sa/3.0/de/deed.en",
-    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_prosciutto_e_funghi_(2010)_by_RaBoe.jpg",
-    "requete": "Pizza regina",
-    "niveau": "approchant"
-  },
   "Le Pizze::Diavola": {
     "fichier": "/photos/plats/diavola.jpg",
     "auteur": "掬茶",
@@ -546,15 +537,6 @@
     "licence_url": "https://creativecommons.org/licenses/by/2.0",
     "source_url": "https://commons.wikimedia.org/wiki/File:Vesuvio_Pizza,_Tatou_Pizza,_Paris_002.jpg",
     "requete": "Pizza vesuvio",
-    "niveau": "approchant"
-  },
-  "Le Pizze::Padrino": {
-    "fichier": "/photos/plats/padrino.jpg",
-    "auteur": "Phil Whitehouse from London, United Kingdom",
-    "licence": "CC BY 2.0",
-    "licence_url": "https://creativecommons.org/licenses/by/2.0",
-    "source_url": "https://commons.wikimedia.org/wiki/File:Pizza_capricciosa.jpg",
-    "requete": "Pizza carciofi prosciutto funghi",
     "niveau": "approchant"
   },
   "Le Pizze::Cappriciosa": {
@@ -619,5 +601,23 @@
     "source_url": "https://commons.wikimedia.org/wiki/File:Parma_ham_pizza_Prosciutto_crudo_laliva_restaurant_bangkok.jpg",
     "requete": "Pizza crudo di Parma",
     "niveau": "exact"
+  },
+  "Le Pizze::Regina": {
+    "fichier": "/photos/plats/regina.jpg",
+    "auteur": "Jamie from Toronto, ON",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Breakfast_Pizza_(3130276288).jpg",
+    "requete": "Pizza with egg and mushrooms",
+    "niveau": "approchant"
+  },
+  "Le Pizze::Padrino": {
+    "fichier": "/photos/plats/padrino.jpg",
+    "auteur": "jeffreyw",
+    "licence": "CC BY 2.0",
+    "licence_url": "https://creativecommons.org/licenses/by/2.0",
+    "source_url": "https://commons.wikimedia.org/wiki/File:Homemade_pizza_(12).jpg",
+    "requete": "Pizza with ham mushrooms and peppers",
+    "niveau": "approchant"
   }
 }

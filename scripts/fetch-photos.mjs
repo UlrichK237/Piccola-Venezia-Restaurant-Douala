@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -145,22 +146,23 @@ async function searchWikimedia(requete, motsCles) {
 
   const data = await res.json();
   if (!data.query || !data.query.pages) {
-    return null;
+    return [];
   }
 
+  const candidates = [];
   const pages = Object.values(data.query.pages);
   for (const page of pages) {
     if (!page.imageinfo || !page.imageinfo[0]) continue;
     const info = page.imageinfo[0];
     if (isValidCandidate(info, page, motsCles)) {
-      return {
+      candidates.push({
         page,
         info,
-      };
+      });
     }
   }
 
-  return null;
+  return candidates;
 }
 
 async function downloadFile(url, destPath) {
@@ -174,6 +176,45 @@ async function downloadFile(url, destPath) {
   }
   const arrayBuffer = await res.arrayBuffer();
   fs.writeFileSync(destPath, Buffer.from(arrayBuffer));
+}
+
+function getExistingSourcesAndTitles(currentKey) {
+  const sources = new Set();
+  const titles = new Set();
+  for (const [k, item] of Object.entries(platPhotos)) {
+    if (k === currentKey) continue;
+    if (item.source_url) {
+      const s = item.source_url.trim().toLowerCase();
+      sources.add(s);
+      const match = item.source_url.match(/File:([^/?#]+)/i);
+      if (match) {
+        const decoded = decodeURIComponent(match[1]).toLowerCase();
+        titles.add(decoded);
+        titles.add(`file:${decoded}`);
+      }
+    }
+  }
+  return { sources, titles };
+}
+
+function getExistingHashes(currentKey) {
+  const hashes = new Map();
+  for (const [k, item] of Object.entries(platPhotos)) {
+    if (k === currentKey) continue;
+    if (!item.fichier) continue;
+    const relPath = item.fichier.startsWith('/') ? item.fichier.slice(1) : item.fichier;
+    const diskPath = path.join(rootDir, 'public', relPath);
+    if (fs.existsSync(diskPath)) {
+      try {
+        const buf = fs.readFileSync(diskPath);
+        const h = crypto.createHash('sha256').update(buf).digest('hex');
+        hashes.set(h, k);
+      } catch (e) {
+        // ignore
+      }
+    }
+  }
+  return hashes;
 }
 
 async function main() {
@@ -216,22 +257,63 @@ async function main() {
     }
 
     console.log(`\nRecherche pour : \x1b[33m${nom}\x1b[0m (${categorie}) [niveau: ${data.niveau}]`);
-    let found = null;
+    let acceptedCandidate = null;
     let successfulQuery = null;
     let finalNiveau = data.niveau;
+
+    const { sources: existingSources, titles: existingTitles } = getExistingSourcesAndTitles(key);
+    const existingHashes = getExistingHashes(key);
 
     // 1. Essai des requêtes configurées
     for (const requete of data.requetes) {
       await sleep(600);
       try {
-        const candidate = await searchWikimedia(requete, data.mots_cles);
-        if (candidate) {
-          found = candidate;
+        const candidates = await searchWikimedia(requete, data.mots_cles);
+        for (const candidate of candidates) {
+          const sourceUrl = candidate.info.descriptionurl || candidate.page.fullurl || '';
+          const pageTitle = candidate.page.title || '';
+          const cleanTitle = pageTitle.replace(/^File:/i, '').toLowerCase();
+
+          // Vérification anti-doublon source_url et titre Commons
+          if (
+            (sourceUrl && existingSources.has(sourceUrl.toLowerCase())) ||
+            (pageTitle && existingTitles.has(pageTitle.toLowerCase())) ||
+            (cleanTitle && existingTitles.has(cleanTitle))
+          ) {
+            console.log(`  - Candidat rejeté (source/titre déjà utilisé par un autre plat) : "${pageTitle}"`);
+            continue;
+          }
+
+          // Téléchargement pour vérifier l'empreinte SHA-256
+          const thumbUrl = candidate.info.thumburl;
+          console.log(`  Téléchargement miniature (${candidate.info.thumbwidth || 720}px) : "${pageTitle}"...`);
+          await sleep(600);
+          await downloadFile(thumbUrl, destPath);
+
+          // Calcul SHA-256
+          const fileBuffer = fs.readFileSync(destPath);
+          const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+
+          if (existingHashes.has(hash)) {
+            const dupDish = existingHashes.get(hash);
+            console.log(`  - Candidat rejeté (SHA-256 identique à "${dupDish}") : "${pageTitle}"`);
+            if (fs.existsSync(destPath)) {
+              fs.unlinkSync(destPath);
+            }
+            continue;
+          }
+
+          // Candidat valide et distinct !
+          acceptedCandidate = candidate;
           successfulQuery = requete;
-          console.log(`  ✓ Trouvé avec requête : "${requete}" (${candidate.page.title})`);
+          console.log(`  ✓ Retenu avec requête : "${requete}" (${pageTitle})`);
+          break;
+        }
+
+        if (acceptedCandidate) {
           break;
         } else {
-          console.log(`  - Aucun résultat pour : "${requete}"`);
+          console.log(`  - Aucun candidat distinct pour : "${requete}"`);
         }
       } catch (err) {
         console.error(`  ✗ Erreur recherche ("${requete}") :`, err.message);
@@ -239,7 +321,7 @@ async function main() {
     }
 
     // 2. Si plat "exact" et rien trouvé : tentative de repli en "approchant"
-    if (!found && data.niveau === 'exact') {
+    if (!acceptedCandidate && data.niveau === 'exact') {
       const fallbackQuery = nom
         .replace(/[/,]/g, ' ')
         .replace(/\s+/g, ' ')
@@ -247,49 +329,74 @@ async function main() {
       console.log(`  Tentative de repli en "approchant" avec : "${fallbackQuery}"...`);
       await sleep(600);
       try {
-        const candidate = await searchWikimedia(fallbackQuery, data.mots_cles);
-        if (candidate) {
-          found = candidate;
+        const candidates = await searchWikimedia(fallbackQuery, data.mots_cles);
+        for (const candidate of candidates) {
+          const sourceUrl = candidate.info.descriptionurl || candidate.page.fullurl || '';
+          const pageTitle = candidate.page.title || '';
+          const cleanTitle = pageTitle.replace(/^File:/i, '').toLowerCase();
+
+          if (
+            (sourceUrl && existingSources.has(sourceUrl.toLowerCase())) ||
+            (pageTitle && existingTitles.has(pageTitle.toLowerCase())) ||
+            (cleanTitle && existingTitles.has(cleanTitle))
+          ) {
+            console.log(`  - Candidat repli rejeté (source/titre déjà utilisé) : "${pageTitle}"`);
+            continue;
+          }
+
+          const thumbUrl = candidate.info.thumburl;
+          console.log(`  Téléchargement miniature repli (${candidate.info.thumbwidth || 720}px) : "${pageTitle}"...`);
+          await sleep(600);
+          await downloadFile(thumbUrl, destPath);
+
+          const fileBuffer = fs.readFileSync(destPath);
+          const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+
+          if (existingHashes.has(hash)) {
+            const dupDish = existingHashes.get(hash);
+            console.log(`  - Candidat repli rejeté (SHA-256 identique à "${dupDish}") : "${pageTitle}"`);
+            if (fs.existsSync(destPath)) {
+              fs.unlinkSync(destPath);
+            }
+            continue;
+          }
+
+          acceptedCandidate = candidate;
           successfulQuery = fallbackQuery;
           finalNiveau = 'approchant';
-          console.log(`  ✓ Trouvé en repli approchant : "${fallbackQuery}" (${candidate.page.title})`);
+          console.log(`  ✓ Retenu en repli approchant : "${fallbackQuery}" (${pageTitle})`);
+          break;
         }
       } catch (err) {
         console.error(`  ✗ Erreur repli ("${fallbackQuery}") :`, err.message);
       }
     }
 
-    if (found) {
-      const extmeta = found.info.extmetadata || {};
+    if (acceptedCandidate) {
+      const extmeta = acceptedCandidate.info.extmetadata || {};
       const author = stripHtml(extmeta.Artist?.value || extmeta.Credit?.value || 'Inconnu');
       const license = extmeta.LicenseShortName?.value || 'Licence libre';
       const licenseUrl = extmeta.LicenseUrl?.value || '';
-      const sourceUrl = found.info.descriptionurl || found.page.fullurl || '';
-      const thumbUrl = found.info.thumburl;
+      const sourceUrl = acceptedCandidate.info.descriptionurl || acceptedCandidate.page.fullurl || '';
 
-      try {
-        console.log(`  Téléchargement miniature (${found.info.thumbwidth || 720}px)...`);
-        await sleep(600);
-        await downloadFile(thumbUrl, destPath);
+      platPhotos[key] = {
+        fichier: publicUrl,
+        auteur: author,
+        licence: license,
+        licence_url: licenseUrl,
+        source_url: sourceUrl,
+        requete: successfulQuery,
+        niveau: finalNiveau,
+      };
 
-        platPhotos[key] = {
-          fichier: publicUrl,
-          auteur: author,
-          licence: license,
-          licence_url: licenseUrl,
-          source_url: sourceUrl,
-          requete: successfulQuery,
-          niveau: finalNiveau,
-        };
-
-        downloadedCount++;
-        console.log(`  \x1b[32m✔ Enregistré dans ${fileName} [${finalNiveau}]\x1b[0m`);
-      } catch (err) {
-        console.error(`  ✗ Échec téléchargement pour ${nom} :`, err.message);
-        missingPhotos.push(`${key} (erreur téléchargement)`);
-      }
+      downloadedCount++;
+      console.log(`  \x1b[32m✔ Enregistré dans ${fileName} [${finalNiveau}]\x1b[0m`);
     } else {
-      console.log(`  \x1b[31m✗ Aucune photo trouvée pour ${nom}\x1b[0m`);
+      if (fs.existsSync(destPath)) {
+        fs.unlinkSync(destPath);
+      }
+      delete platPhotos[key];
+      console.log(`  \x1b[31m✗ SANS PHOTO (aucun candidat distinct) pour ${nom}\x1b[0m`);
       missingPhotos.push(key);
     }
   }

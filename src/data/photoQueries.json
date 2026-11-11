@@ -348,8 +348,8 @@
     "niveau": "approchant"
   },
   "Le Pizze::Regina": {
-    "requetes": ["Pizza regina", "Pizza regina funghi olive"],
-    "mots_cles": ["regina", "pizza"],
+    "requetes": ["Pizza with egg and mushrooms", "Pizza ai funghi con uovo", "Pizza regina funghi olive uovo", "Pizza with olives and egg"],
+    "mots_cles": ["egg", "uovo", "olive", "olives"],
     "exclu": false,
     "niveau": "approchant"
   },
@@ -366,8 +366,8 @@
     "niveau": "approchant"
   },
   "Le Pizze::Padrino": {
-    "requetes": ["Pizza carciofi prosciutto funghi", "Pizza ham mushrooms artichokes"],
-    "mots_cles": ["pizza"],
+    "requetes": ["Pizza with ham mushrooms and peppers", "Pizza prosciutto peperoni carciofi", "Pizza with ham and peppers", "Pizza with artichokes and ham"],
+    "mots_cles": ["pepper", "peppers", "peperoni", "peperone", "artichoke", "carciofi"],
     "exclu": false,
     "niveau": "approchant"
   },

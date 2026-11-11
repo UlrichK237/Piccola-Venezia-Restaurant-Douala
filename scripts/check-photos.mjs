@@ -2,6 +2,7 @@
 import fs from 'node:fs';
 import path from 'node:path';
 import { fileURLToPath } from 'node:url';
+import crypto from 'node:crypto';
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
@@ -54,8 +55,13 @@ const erreurs = {
   platInexistant: [],
   fichierAbsent: [],
   cheminHttp: [],
-  metadonneesVides: []
+  metadonneesVides: [],
+  doublons: []
 };
+
+const mapSourceUrls = new Map();
+const mapFichiers = new Map();
+const mapHashes = new Map();
 
 for (const [key, item] of Object.entries(platPhotos)) {
   // 1. Photo dont le plat n'existe pas dans photoQueries.json
@@ -73,7 +79,27 @@ for (const [key, item] of Object.entries(platPhotos)) {
     const fullDiskPath = path.join(publicDir, relPath);
     if (!fs.existsSync(fullDiskPath)) {
       erreurs.fichierAbsent.push(`${key} -> ${fichier} (introuvable dans ${path.relative(rootDir, fullDiskPath)})`);
+    } else {
+      // Calcul du hash SHA-256 pour vérifier l'unicité du contenu
+      try {
+        const fileBuffer = fs.readFileSync(fullDiskPath);
+        const hash = crypto.createHash('sha256').update(fileBuffer).digest('hex');
+        if (!mapHashes.has(hash)) {
+          mapHashes.set(hash, []);
+        }
+        mapHashes.get(hash).push({ plat: key, fichier });
+      } catch (err) {
+        console.error(`Impossible de hasher ${fullDiskPath} :`, err.message);
+      }
     }
+  }
+
+  // Enregistrement pour détection de doublons de fichier
+  if (fichier) {
+    if (!mapFichiers.has(fichier)) {
+      mapFichiers.set(fichier, []);
+    }
+    mapFichiers.get(fichier).push(key);
   }
 
   // 4. Entrée sans auteur, licence ou source_url
@@ -86,6 +112,68 @@ for (const [key, item] of Object.entries(platPhotos)) {
     if (!licence) manquants.push('licence');
     if (!sourceUrl) manquants.push('source_url');
     erreurs.metadonneesVides.push(`${key} (champs manquants : ${manquants.join(', ')})`);
+  } else {
+    if (!mapSourceUrls.has(sourceUrl)) {
+      mapSourceUrls.set(sourceUrl, []);
+    }
+    mapSourceUrls.get(sourceUrl).push({ plat: key, fichier });
+  }
+}
+
+// Analyse des doublons de source_url
+for (const [sourceUrl, entries] of mapSourceUrls.entries()) {
+  if (entries.length > 1) {
+    for (let i = 0; i < entries.length; i++) {
+      for (let j = i + 1; j < entries.length; j++) {
+        erreurs.doublons.push({
+          type: 'même source_url',
+          platA: entries[i].plat,
+          platB: entries[j].plat,
+          fichierA: entries[i].fichier,
+          fichierB: entries[j].fichier,
+          detail: sourceUrl
+        });
+      }
+    }
+  }
+}
+
+// Analyse des doublons de nom de fichier
+for (const [fichier, plats] of mapFichiers.entries()) {
+  if (plats.length > 1) {
+    for (let i = 0; i < plats.length; i++) {
+      for (let j = i + 1; j < plats.length; j++) {
+        erreurs.doublons.push({
+          type: 'même fichier',
+          platA: plats[i],
+          platB: plats[j],
+          fichierA: fichier,
+          fichierB: fichier,
+          detail: fichier
+        });
+      }
+    }
+  }
+}
+
+// Analyse des doublons de contenu SHA-256
+for (const [hash, entries] of mapHashes.entries()) {
+  if (entries.length > 1) {
+    for (let i = 0; i < entries.length; i++) {
+      for (let j = i + 1; j < entries.length; j++) {
+        // N'ajouter que si ce n'est pas déjà un doublon de même fichier (pour éviter la redondance)
+        if (entries[i].fichier !== entries[j].fichier) {
+          erreurs.doublons.push({
+            type: 'contenu identique (SHA-256)',
+            platA: entries[i].plat,
+            platB: entries[j].plat,
+            fichierA: entries[i].fichier,
+            fichierB: entries[j].fichier,
+            detail: `SHA-256: ${hash.slice(0, 16)}...`
+          });
+        }
+      }
+    }
   }
 }
 
@@ -93,11 +181,20 @@ const totalErreurs =
   erreurs.platInexistant.length +
   erreurs.fichierAbsent.length +
   erreurs.cheminHttp.length +
-  erreurs.metadonneesVides.length;
+  erreurs.metadonneesVides.length +
+  erreurs.doublons.length;
 
 if (totalErreurs > 0) {
   console.error('\x1b[31m%s\x1b[0m', `ERREURS DÉTECTÉES (${totalErreurs}) :`);
 
+  if (erreurs.doublons.length > 0) {
+    console.error('\nDoublons détectés entre plats :');
+    erreurs.doublons.forEach(d => {
+      console.error(
+        `  - [${d.type}] Paire : "${d.platA}" & "${d.platB}"\n    Fichiers : ${d.fichierA} / ${d.fichierB}\n    Détail : ${d.detail}`
+      );
+    });
+  }
   if (erreurs.platInexistant.length > 0) {
     console.error('\nPlats dans platPhotos.json absents de photoQueries.json :');
     erreurs.platInexistant.forEach(e => console.error(`  - ${e}`));
@@ -118,6 +215,6 @@ if (totalErreurs > 0) {
   console.error("\nLe script s'est terminé avec code 1 en raison des erreurs ci-dessus.");
   process.exit(1);
 } else {
-  console.log('\x1b[32m%s\x1b[0m', '✔ Aucune erreur détectée : la configuration et les photos sont valides.');
+  console.log('\x1b[32m%s\x1b[0m', '✔ Aucune erreur détectée : la configuration, les photos et leur unicité sont valides.');
   process.exit(0);
 }

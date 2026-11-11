@@ -260,7 +260,7 @@ export const MenuSection: React.FC = () => {
         {/* Barre de catégories collante (surface #EB7F36 avec texte #2B1A12 dessus) */}
         <nav
           aria-label="Catégories du menu"
-          className="sticky top-16 z-30 bg-[#FBF6EE]/95 backdrop-blur-md border-y border-[#EADFCF] -mx-4 sm:-mx-6 px-4 sm:px-6 shadow-sm"
+          className="sticky top-16 z-30 bg-[#F0E6D8]/95 backdrop-blur-md border-y border-[#EADFCF] -mx-4 sm:-mx-6 px-4 sm:px-6 shadow-sm"
         >
           <div className="max-w-4xl mx-auto flex items-center gap-2 overflow-x-auto py-2.5 no-scrollbar scroll-smooth">
             {menuCategories.map(cat => {
