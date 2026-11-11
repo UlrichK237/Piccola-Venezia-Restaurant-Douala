@@ -23,6 +23,8 @@ export const Footer: React.FC<FooterProps> = ({ onOpenPrivacy }) => {
             <img
               src="/assets/logo_5b391c43.png"
               alt="L'italien Piccola Venezia"
+              width={400}
+              height={150}
               className="max-w-[200px] w-auto h-8 object-contain"
             />
             <div>

@@ -17,14 +17,13 @@ const normalizeText = (text: string): string => {
     .toLowerCase();
 };
 
+import { appliquerCorrections } from '../lib/corrections';
+
 /**
  * Applique le dictionnaire corrections.json au rendu si une correspondance existe.
- * Exemple : "Cappriciosa" -> "Capricciosa".
  */
-export const applyCorrection = (text: string | null): string => {
-  if (!text) return '';
-  const dict = corrections as Record<string, string>;
-  return dict[text] || text;
+export const applyCorrection = (text: string | null | undefined): string => {
+  return appliquerCorrections(text, corrections as Record<string, string>);
 };
 
 /**
@@ -138,9 +137,10 @@ export const MenuSection: React.FC = () => {
     return menuCategories
       .map(category => {
         const matchingPlats = category.plats.filter(plat => {
-          const matchNom = normalizeText(plat.nom).includes(q);
-          const matchDesc = plat.description ? normalizeText(plat.description).includes(q) : false;
-          return matchNom || matchDesc;
+          const matchNom = normalizeText(applyCorrection(plat.nom)).includes(q);
+          const matchDesc = plat.description ? normalizeText(applyCorrection(plat.description)).includes(q) : false;
+          const matchNote = plat.note ? normalizeText(applyCorrection(plat.note)).includes(q) : false;
+          return matchNom || matchDesc || matchNote;
         });
 
         return {
@@ -357,7 +357,8 @@ export const MenuSection: React.FC = () => {
                 >
                   {cat.plats.map((plat, idx) => {
                     const correctedNom = applyCorrection(plat.nom);
-                    const { mainText, accompagnement } = parseDescription(plat.description);
+                    const correctedDesc = applyCorrection(plat.description);
+                    const { mainText, accompagnement } = parseDescription(correctedDesc);
                     const photoKey = `${cat.categorie}::${plat.nom}`;
                     const photoInfo = platPhotosMap[photoKey] || null;
 
@@ -422,7 +423,7 @@ export const MenuSection: React.FC = () => {
                         {/* Note discrète sous la description (affichée uniquement si non redondante) */}
                         {shouldDisplayNote(plat.note, plat.description) && (
                           <span className="block text-[11px] sm:text-xs text-[#A84A15] italic font-sans mt-1">
-                            ({plat.note})
+                            ({applyCorrection(plat.note)})
                           </span>
                         )}
 

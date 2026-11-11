@@ -4,6 +4,7 @@ import { Plat } from '../data/restaurantData';
 import { formatFCFA } from '../config';
 import { nettoyerTexte } from '../lib/securite';
 import { useModalA11y } from '../hooks/useModalA11y';
+import { applyCorrection } from './MenuSection';
 
 interface OptionModalProps {
   isOpen: boolean;
@@ -121,7 +122,7 @@ export const OptionModal: React.FC<OptionModalProps> = ({
               {categorie}
             </span>
             <h2 id="option-modal-title" className="font-serif font-bold text-lg text-[#2B1A12]">
-              {plat.nom}
+              {applyCorrection(plat.nom)}
             </h2>
           </div>
           <button

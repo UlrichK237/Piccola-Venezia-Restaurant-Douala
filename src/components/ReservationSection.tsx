@@ -1,69 +1,40 @@
-import React, { useState, useMemo, useRef } from 'react';
-import { Calendar, Clock, Users, Send, Phone, Copy, Check, ExternalLink, Sparkles } from 'lucide-react';
-import { RESERVATION_SETTINGS, RESTAURANT_WHATSAPP_DISPLAY } from '../config';
+import React, { useState, useMemo } from 'react';
+import { Send, Phone, Copy, Check, ExternalLink } from 'lucide-react';
+import { RESERVATION_SETTINGS } from '../config';
 import { RESTAURANT_DATA } from '../data/restaurantData';
 import {
   nettoyerTexte,
   validateNom,
-  validateCameroonPhone,
+  validatePhone,
   getPhoneDigits
 } from '../lib/securite';
 import {
+  maintenantDouala,
+  calculerDateMaxIso,
+  genererCreneauxHoraires
+} from '../lib/horaires';
+import {
   buildWhatsAppUrl,
   buildSimpleWhatsAppUrl,
+  getWhatsappDigits,
   isWhatsAppUrlTooLong,
   openWhatsApp
 } from '../lib/whatsapp';
+import { useCopier } from '../hooks/useCopier';
 
 interface ReservationSectionProps {
   onOpenPrivacy?: () => void;
-}
-
-/**
- * Analyse la chaîne d'horaires (ex: "11:30 - 22:30", "11h30 – 23h")
- * et génère les créneaux par pas de 30 min jusqu'à 60 min avant la fermeture.
- */
-function genererCreneauxHoraires(horairesStr: string): string[] {
-  if (!horairesStr) return [];
-
-  const match = horairesStr.match(/(\d{1,2})[h:]?(\d{2})?\s*[-—–]\s*(\d{1,2})[h:]?(\d{2})?/i);
-  if (!match) return [];
-
-  const hDebut = parseInt(match[1], 10);
-  const mDebut = match[2] ? parseInt(match[2], 10) : 0;
-  const hFin = parseInt(match[3], 10);
-  const mFin = match[4] ? parseInt(match[4], 10) : 0;
-
-  if (isNaN(hDebut) || isNaN(hFin)) return [];
-
-  const debutMins = hDebut * 60 + mDebut;
-  const finMins = hFin * 60 + mFin;
-
-  // Créneaux jusqu'à 60 min avant la fermeture
-  const dernierCreneauMins = finMins - 60;
-  if (dernierCreneauMins <= debutMins) return [];
-
-  const slots: string[] = [];
-  for (let m = debutMins; m <= dernierCreneauMins; m += 30) {
-    const hh = Math.floor(m / 60);
-    const mm = m % 60;
-    slots.push(`${String(hh).padStart(2, '0')}:${String(mm).padStart(2, '0')}`);
-  }
-
-  return slots;
 }
 
 export const ReservationSection: React.FC<ReservationSectionProps> = ({ onOpenPrivacy }) => {
   const lieu = RESTAURANT_DATA.lieux[0];
   const telRestaurantDigits = getPhoneDigits(lieu.telephone);
 
-  // Calcul des dates min et max
+  // Calcul initial selon l'heure officielle à Douala
   const { todayIso, maxDateIso, nowMinutes } = useMemo(() => {
-    const now = new Date();
-    const today = now.toISOString().split('T')[0];
-    const maxDate = new Date(now.getTime() + 60 * 24 * 60 * 60 * 1000).toISOString().split('T')[0];
-    const minutes = now.getHours() * 60 + now.getMinutes();
-    return { todayIso: today, maxDateIso: maxDate, nowMinutes: minutes };
+    const { dateIso, minutes } = maintenantDouala();
+    const maxIso = calculerDateMaxIso(dateIso, 60);
+    return { todayIso: dateIso, maxDateIso: maxIso, nowMinutes: minutes };
   }, []);
 
   // Génération des créneaux
@@ -90,7 +61,8 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({ onOpenPr
 
   const [isSubmitted, setIsSubmitted] = useState(false);
   const [preparedMessage, setPreparedMessage] = useState('');
-  const [copied, setCopied] = useState(false);
+  const { copier, copieStatut } = useCopier();
+  const whatsappDigits = getWhatsappDigits();
 
   // Filtrage des créneaux disponibles selon la date choisie
   const availableSlots = useMemo(() => {
@@ -105,35 +77,59 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({ onOpenPr
     return allSlots;
   }, [date, todayIso, nowMinutes, allSlots]);
 
-  // Sélectionne par défaut le premier créneau disponible si non sélectionné
+  // Si aucun créneau disponible, heure remise à vide ; sinon sélectionne le premier si invalide
   React.useEffect(() => {
-    if (availableSlots.length > 0 && !availableSlots.includes(heure)) {
-      setHeure(availableSlots[0]);
+    if (allSlots.length > 0) {
+      if (availableSlots.length === 0) {
+        setHeure('');
+      } else if (!availableSlots.includes(heure)) {
+        setHeure(availableSlots[0]);
+      }
     }
-  }, [availableSlots, heure]);
+  }, [availableSlots, heure, allSlots.length]);
 
   const validateForm = (): boolean => {
     const newErrors: { nom?: string; telephone?: string; date?: string; heure?: string } = {};
+
+    // Recalcul en temps réel de l'heure et des dates dans le fuseau de Douala
+    const freshDouala = maintenantDouala();
+    const currentTodayIso = freshDouala.dateIso;
+    const currentNowMinutes = freshDouala.minutes;
+    const currentMaxDateIso = calculerDateMaxIso(currentTodayIso, 60);
 
     const nomVal = validateNom(nom);
     if (!nomVal.isValid) {
       newErrors.nom = nomVal.error;
     }
 
-    const phoneVal = validateCameroonPhone(telephone);
+    const phoneVal = validatePhone(telephone);
     if (!phoneVal.isValid) {
       newErrors.telephone = phoneVal.error;
     }
 
-    if (!date || date < todayIso || date > maxDateIso) {
+    if (!date || date < currentTodayIso || date > currentMaxDateIso) {
       newErrors.date = 'Veuillez choisir une date valide (entre aujourd’hui et 60 jours).';
     }
 
-    const finalHeure = allSlots.length > 0 ? heure : heureManuelle;
-    if (!finalHeure) {
-      newErrors.heure = 'Veuillez sélectionner ou indiquer une heure.';
-    } else if (allSlots.length === 0 && !/^([01]\d|2[0-3]):[0-5]\d$/.test(finalHeure)) {
-      newErrors.heure = 'Format d’heure invalide (HH:MM attendu).';
+    if (allSlots.length > 0) {
+      // Filtrage dynamique à l'instant précis de la soumission
+      const freshAvailableSlots = date === currentTodayIso
+        ? allSlots.filter(s => {
+            const [h, m] = s.split(':').map(Number);
+            return h * 60 + m >= currentNowMinutes + 60;
+          })
+        : allSlots;
+
+      if (!heure || !freshAvailableSlots.includes(heure)) {
+        newErrors.heure = "Cette heure n'est plus disponible. Choisissez un autre créneau.";
+        setHeure('');
+      }
+    } else {
+      if (!heureManuelle) {
+        newErrors.heure = 'Veuillez sélectionner ou indiquer une heure.';
+      } else if (!/^([01]\d|2[0-3]):[0-5]\d$/.test(heureManuelle)) {
+        newErrors.heure = 'Format d’heure invalide (HH:MM attendu).';
+      }
     }
 
     setErrors(newErrors);
@@ -145,7 +141,7 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({ onOpenPr
     if (!validateForm()) return;
 
     const cleanNom = nettoyerTexte(nom, 60);
-    const phoneVal = validateCameroonPhone(telephone);
+    const phoneVal = validatePhone(telephone);
     const cleanPhone = phoneVal.isValid ? phoneVal.formatted : telephone;
     const finalHeure = allSlots.length > 0 ? heure : heureManuelle;
     const cleanOccasion = occasion !== 'Repas classique' ? nettoyerTexte(occasion, 60) : '';
@@ -172,24 +168,15 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({ onOpenPr
     const fullUrl = buildWhatsAppUrl(message);
     const simpleUrl = buildSimpleWhatsAppUrl();
 
-    if (isTooLong) {
-      if (simpleUrl) openWhatsApp(simpleUrl);
-    } else if (fullUrl) {
-      openWhatsApp(fullUrl);
+    if (whatsappDigits) {
+      if (isTooLong) {
+        if (simpleUrl) openWhatsApp(simpleUrl);
+      } else if (fullUrl) {
+        openWhatsApp(fullUrl);
+      }
     }
 
     setIsSubmitted(true);
-  };
-
-  const handleCopy = async () => {
-    if (!preparedMessage) return;
-    try {
-      await navigator.clipboard.writeText(preparedMessage);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    } catch {
-      // Fallback
-    }
   };
 
   return (
@@ -226,10 +213,12 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({ onOpenPr
 
             <div className="space-y-2">
               <h3 className="font-serif font-bold text-xl text-[#2B1A12]">
-                Votre demande est prête dans WhatsApp
+                {whatsappDigits ? 'Votre demande est prête dans WhatsApp' : 'Votre demande de réservation est prête'}
               </h3>
               <p className="text-xs sm:text-sm text-[#6B5446] max-w-md mx-auto leading-relaxed">
-                Il reste une étape : envoyez le message pré-rempli dans l'application WhatsApp. La réservation sera effective dès réception de la réponse du restaurant.
+                {whatsappDigits
+                  ? "Il reste une étape : envoyez le message pré-rempli dans l'application WhatsApp. La réservation sera effective dès réception de la réponse du restaurant."
+                  : 'Copiez le message préparé ci-dessous ou appelez directement le restaurant pour finaliser votre réservation.'}
               </p>
             </div>
 
@@ -239,51 +228,91 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({ onOpenPr
                 <span>Texte du message :</span>
                 <button
                   type="button"
-                  onClick={handleCopy}
+                  onClick={() => copier(preparedMessage)}
                   className="text-[#A84A15] hover:underline inline-flex items-center gap-1 cursor-pointer"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Copié !' : 'Copier'}</span>
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>Copier</span>
                 </button>
               </div>
-              <pre className="p-3 bg-[#FBF6EE] rounded-lg border border-[#D9C8B4] text-[11px] text-[#2B1A12] whitespace-pre-wrap font-sans">
-                {preparedMessage}
-              </pre>
+              <textarea
+                readOnly
+                aria-label="Message prêt à copier"
+                value={preparedMessage}
+                rows={6}
+                className="w-full p-3 bg-[#FBF6EE] rounded-lg border border-[#D9C8B4] text-[11px] text-[#2B1A12] font-sans resize-none focus:outline-none focus:border-[#A84A15]"
+              />
+              {copieStatut === 'ok' && (
+                <p role="status" className="text-xs text-green-700 font-medium">
+                  Message copié
+                </p>
+              )}
+              {copieStatut === 'echec' && (
+                <p role="status" className="text-xs text-red-600 font-medium">
+                  Copie impossible : sélectionnez le texte ci-dessus et copiez-le.
+                </p>
+              )}
             </div>
 
-            {/* 3 Secours visibles (Bloc B.4) */}
+            {/* Actions et options de secours */}
             <div className="p-4 rounded-xl bg-[#F0E6D8]/70 border border-[#EADFCF] space-y-3 max-w-md mx-auto text-left">
-              <div className="text-xs font-bold text-[#2B1A12]">Options de secours :</div>
-              <div className="flex flex-col gap-2">
-                <button
-                  type="button"
-                  onClick={handleCopy}
-                  className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition cursor-pointer"
-                >
-                  <Copy className="w-3.5 h-3.5 text-[#A84A15]" />
-                  <span>{copied ? 'Message copié !' : 'Copier le message'}</span>
-                </button>
+              <div className="text-xs font-bold text-[#2B1A12]">Options :</div>
+              {whatsappDigits ? (
+                <div className="flex flex-col gap-2">
+                  <button
+                    type="button"
+                    onClick={() => copier(preparedMessage)}
+                    className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition cursor-pointer"
+                  >
+                    <Copy className="w-3.5 h-3.5 text-[#A84A15]" />
+                    <span>Copier le message</span>
+                  </button>
 
-                <button
-                  type="button"
-                  onClick={() => {
-                    const url = buildWhatsAppUrl(preparedMessage) || buildSimpleWhatsAppUrl();
-                    if (url) openWhatsApp(url);
-                  }}
-                  className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition cursor-pointer"
-                >
-                  <ExternalLink className="w-3.5 h-3.5 text-[#A84A15]" />
-                  <span>Ouvrir WhatsApp</span>
-                </button>
+                  <button
+                    type="button"
+                    onClick={() => {
+                      const url = buildWhatsAppUrl(preparedMessage) || buildSimpleWhatsAppUrl();
+                      if (url) openWhatsApp(url);
+                    }}
+                    className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition cursor-pointer"
+                  >
+                    <ExternalLink className="w-3.5 h-3.5 text-[#A84A15]" />
+                    <span>Ouvrir WhatsApp</span>
+                  </button>
 
-                <a
-                  href={`tel:${telRestaurantDigits}`}
-                  className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition text-center"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#A84A15]" />
-                  <span>Appeler le {RESTAURANT_WHATSAPP_DISPLAY}</span>
-                </a>
-              </div>
+                  <a
+                    href={`tel:${telRestaurantDigits}`}
+                    className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition text-center"
+                  >
+                    <Phone className="w-3.5 h-3.5 text-[#A84A15]" />
+                    <span>Appeler</span>
+                  </a>
+                </div>
+              ) : (
+                <div className="space-y-2.5">
+                  <p className="text-xs text-[#6B5446]">
+                    L'envoi par WhatsApp n'est pas disponible pour le moment. Copiez le message ou appelez le restaurant.
+                  </p>
+                  <div className="flex flex-col gap-2">
+                    <button
+                      type="button"
+                      onClick={() => copier(preparedMessage)}
+                      className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition cursor-pointer"
+                    >
+                      <Copy className="w-3.5 h-3.5 text-[#A84A15]" />
+                      <span>Copier le message</span>
+                    </button>
+
+                    <a
+                      href={`tel:${telRestaurantDigits}`}
+                      className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition text-center"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-[#A84A15]" />
+                      <span>Appeler</span>
+                    </a>
+                  </div>
+                </div>
+              )}
             </div>
 
             <div className="pt-2">
@@ -329,20 +358,23 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({ onOpenPr
 
               <div className="space-y-1">
                 <label htmlFor="res-tel" className="block text-xs font-bold uppercase tracking-wider text-[#2B1A12]">
-                  Téléphone (Cameroun) *
+                  Téléphone *
                 </label>
                 <input
                   id="res-tel"
                   type="tel"
-                  maxLength={20}
+                  maxLength={25}
                   required
                   value={telephone}
                   onChange={e => setTelephone(e.target.value)}
                   placeholder="Ex. 6 99 93 17 21"
                   aria-invalid={Boolean(errors.telephone)}
-                  aria-describedby={errors.telephone ? 'res-tel-err' : undefined}
+                  aria-describedby={errors.telephone ? 'res-tel-err' : 'res-tel-help'}
                   className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-xs sm:text-sm text-[#2B1A12] placeholder-[#8C7565] focus:outline-none focus:border-[#A84A15] transition"
                 />
+                <p id="res-tel-help" className="text-[11px] text-[#6B5446]">
+                  Numéro camerounais ou international avec indicatif
+                </p>
                 {errors.telephone && (
                   <p id="res-tel-err" role="alert" className="text-[11px] text-red-600 font-medium">
                     {errors.telephone}
@@ -508,7 +540,13 @@ export const ReservationSection: React.FC<ReservationSectionProps> = ({ onOpenPr
             <div className="pt-2">
               <button
                 type="submit"
-                className="w-full py-3.5 px-6 rounded-xl bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
+                disabled={allSlots.length > 0 && availableSlots.length === 0}
+                aria-disabled={allSlots.length > 0 && availableSlots.length === 0}
+                className={`w-full py-3.5 px-6 rounded-xl font-bold text-sm sm:text-base flex items-center justify-center gap-2 transition shadow-sm ${
+                  allSlots.length > 0 && availableSlots.length === 0
+                    ? 'bg-[#EADFCF] text-[#8C7565] cursor-not-allowed opacity-70'
+                    : 'bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] cursor-pointer'
+                }`}
               >
                 <Send className="w-4 h-4" />
                 <span>Envoyer ma demande sur WhatsApp</span>

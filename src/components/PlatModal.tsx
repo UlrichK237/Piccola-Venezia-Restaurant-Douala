@@ -109,7 +109,8 @@ export const PlatModal: React.FC<PlatModalProps> = ({
   if (!isOpen || !plat) return null;
 
   const correctedNom = applyCorrection(plat.nom);
-  const { mainText, accompagnement } = parseDescription(plat.description);
+  const correctedDesc = applyCorrection(plat.description);
+  const { mainText, accompagnement } = parseDescription(correctedDesc);
   const displayNote = shouldDisplayNote(plat.note, plat.description);
 
   return (
@@ -235,7 +236,7 @@ export const PlatModal: React.FC<PlatModalProps> = ({
           {/* Note si non redondante */}
           {displayNote && (
             <p className="text-[11px] sm:text-xs text-[#A84A15] italic font-sans">
-              ({plat.note})
+              ({applyCorrection(plat.note)})
             </p>
           )}
         </div>

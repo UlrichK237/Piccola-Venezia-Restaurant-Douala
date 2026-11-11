@@ -24,6 +24,9 @@ export function nettoyerTexte(
   // Supprime caractères de largeur nulle
   t = t.replace(/[\u200B-\u200D\uFEFF]/g, '');
 
+  // Supprime les balises HTML complètes
+  t = t.replace(/<[^>]*>/g, '');
+
   // Supprime symboles WhatsApp et chevrons
   t = t.replace(/[*_~`<>]/g, '');
 
@@ -60,54 +63,217 @@ export function nettoyerTexte(
 
 /**
  * Valide un nom complet : entre 2 et 60 caractères, doit contenir des lettres.
+ * Refuse explicitement balises HTML, scripts et chevrons.
  */
-export function validateNom(nom: string): { isValid: boolean; cleaned: string; error?: string } {
+export function validateNom(nom: string): {
+  isValid: boolean;
+  valide: boolean;
+  cleaned: string;
+  error?: string;
+  erreur?: string;
+} {
+  if (!nom || typeof nom !== 'string') {
+    return {
+      isValid: false,
+      valide: false,
+      cleaned: '',
+      error: 'Veuillez saisir votre nom (au moins 2 caractères).',
+      erreur: 'Veuillez saisir votre nom (au moins 2 caractères).'
+    };
+  }
+
+  if (nom.includes('<') || nom.includes('>') || /<[^>]+>/i.test(nom) || /script/i.test(nom)) {
+    return {
+      isValid: false,
+      valide: false,
+      cleaned: '',
+      error: 'Le nom ne peut pas contenir de balises HTML ou caractères non autorisés.',
+      erreur: 'Le nom ne peut pas contenir de balises HTML ou caractères non autorisés.'
+    };
+  }
+
   const cleaned = nettoyerTexte(nom, 60, { multiligne: false });
   if (cleaned.length < 2) {
-    return { isValid: false, cleaned, error: 'Veuillez saisir votre nom (au moins 2 caractères).' };
+    return {
+      isValid: false,
+      valide: false,
+      cleaned,
+      error: 'Veuillez saisir votre nom (au moins 2 caractères).',
+      erreur: 'Veuillez saisir votre nom (au moins 2 caractères).'
+    };
   }
-  if (!/[a-zA-ZÀ-ÿ]/.test(cleaned)) {
-    return { isValid: false, cleaned, error: 'Le nom doit contenir des lettres.' };
+  if (!/\p{L}/u.test(cleaned)) {
+    return {
+      isValid: false,
+      valide: false,
+      cleaned,
+      error: 'Le nom doit contenir des lettres.',
+      erreur: 'Le nom doit contenir des lettres.'
+    };
   }
-  return { isValid: true, cleaned };
+  return { isValid: true, valide: true, cleaned };
 }
 
 /**
- * Valide un numéro de téléphone camerounais (+237 ou 9 chiffres).
+ * Valide un numéro de téléphone camerounais ou international.
  */
-export function validateCameroonPhone(phone: string): {
+export function validatePhone(phone: string): {
   isValid: boolean;
+  valide: boolean;
+  telephoneE164: string;
+  telephoneNormalise: string;
   cleaned: string;
   formatted: string;
   error?: string;
+  erreur?: string;
 } {
-  if (!phone) {
-    return { isValid: false, cleaned: '', formatted: '', error: 'Le numéro de téléphone est obligatoire.' };
+  if (!phone || typeof phone !== 'string') {
+    const msg = 'Le numéro de téléphone est obligatoire.';
+    return {
+      isValid: false,
+      valide: false,
+      telephoneE164: '',
+      telephoneNormalise: '',
+      cleaned: '',
+      formatted: '',
+      error: msg,
+      erreur: msg
+    };
   }
 
-  const digits = phone.replace(/\D/g, '');
+  // Retirer les espaces, points, tirets et parenthèses
+  let s = phone.replace(/[\s.\-()]/g, '');
 
-  let nationalNumber = digits;
-  if (digits.startsWith('237') && digits.length === 12) {
-    nationalNumber = digits.slice(3);
+  if (!s) {
+    const msg = 'Le numéro de téléphone est obligatoire.';
+    return {
+      isValid: false,
+      valide: false,
+      telephoneE164: '',
+      telephoneNormalise: '',
+      cleaned: '',
+      formatted: '',
+      error: msg,
+      erreur: msg
+    };
+  }
+
+  // Un numéro qui commence par "00" voit ce préfixe remplacé par "+"
+  if (s.startsWith('00')) {
+    s = '+' + s.slice(2);
+  }
+
+  if (s.startsWith('+')) {
+    const digits = s.slice(1);
+    if (!/^\d+$/.test(digits) || digits.length < 8 || digits.length > 15 || digits[0] === '0') {
+      const msg = 'Numéro international invalide : 8 à 15 chiffres requis avec indicatif.';
+      return {
+        isValid: false,
+        valide: false,
+        telephoneE164: '',
+        telephoneNormalise: '',
+        cleaned: digits,
+        formatted: phone,
+        error: msg,
+        erreur: msg
+      };
+    }
+
+    if (digits.startsWith('237')) {
+      const national = digits.slice(3);
+      if (national.length !== 9) {
+        const msg = 'Le numéro doit comporter 9 chiffres (ex : 6 99 93 17 21).';
+        return {
+          isValid: false,
+          valide: false,
+          telephoneE164: '',
+          telephoneNormalise: '',
+          cleaned: digits,
+          formatted: phone,
+          error: msg,
+          erreur: msg
+        };
+      }
+      if (national[0] !== '6' && national[0] !== '2') {
+        const msg = "Un numéro camerounais commence par 6 ou 2. Pour un numéro étranger, écrivez-le avec l'indicatif (ex : +33 6 12 34 56 78).";
+        return {
+          isValid: false,
+          valide: false,
+          telephoneE164: '',
+          telephoneNormalise: '',
+          cleaned: digits,
+          formatted: phone,
+          error: msg,
+          erreur: msg
+        };
+      }
+      const formatted = `+237 ${national[0]} ${national.slice(1, 3)} ${national.slice(3, 5)} ${national.slice(5, 7)} ${national.slice(7, 9)}`;
+      return {
+        isValid: true,
+        valide: true,
+        telephoneE164: `+237${national}`,
+        telephoneNormalise: national,
+        cleaned: `237${national}`,
+        formatted
+      };
+    }
+
+    return {
+      isValid: true,
+      valide: true,
+      telephoneE164: `+${digits}`,
+      telephoneNormalise: digits,
+      cleaned: digits,
+      formatted: `+${digits}`
+    };
+  }
+
+  // Un numéro sans préfixe est un numéro camerounais
+  if (!/^\d+$/.test(s)) {
+    const msg = 'Le numéro doit comporter 9 chiffres (ex : 6 99 93 17 21).';
+    return {
+      isValid: false,
+      valide: false,
+      telephoneE164: '',
+      telephoneNormalise: '',
+      cleaned: s,
+      formatted: phone,
+      error: msg,
+      erreur: msg
+    };
+  }
+
+  let nationalNumber = s;
+  if (s.startsWith('237') && s.length === 12) {
+    nationalNumber = s.slice(3);
   }
 
   if (nationalNumber.length !== 9) {
+    const msg = 'Le numéro doit comporter 9 chiffres (ex : 6 99 93 17 21).';
     return {
       isValid: false,
-      cleaned: digits,
+      valide: false,
+      telephoneE164: '',
+      telephoneNormalise: '',
+      cleaned: s,
       formatted: phone,
-      error: 'Le numéro doit comporter 9 chiffres (ex: 6 99 93 17 21).'
+      error: msg,
+      erreur: msg
     };
   }
 
   const firstDigit = nationalNumber[0];
   if (firstDigit !== '6' && firstDigit !== '2') {
+    const msg = "Un numéro camerounais commence par 6 ou 2. Pour un numéro étranger, écrivez-le avec l'indicatif (ex : +33 6 12 34 56 78).";
     return {
       isValid: false,
-      cleaned: digits,
+      valide: false,
+      telephoneE164: '',
+      telephoneNormalise: '',
+      cleaned: s,
       formatted: phone,
-      error: 'Un numéro camerounais valide commence par 6 ou 2.'
+      error: msg,
+      erreur: msg
     };
   }
 
@@ -115,9 +281,56 @@ export function validateCameroonPhone(phone: string): {
 
   return {
     isValid: true,
+    valide: true,
+    telephoneE164: `+237${nationalNumber}`,
+    telephoneNormalise: nationalNumber,
     cleaned: `237${nationalNumber}`,
     formatted
   };
+}
+
+export const validateCameroonPhone = validatePhone;
+
+/**
+ * Assainit un texte : neutralise balises HTML et sauts de ligne excessifs.
+ */
+export function sanitizeText(texte: string | null | undefined): string {
+  if (texte === null || texte === undefined) return '';
+  return nettoyerTexte(texte, 2000, { multiligne: true });
+}
+
+/**
+ * Construit une URL WhatsApp sécurisée en vérifiant le numéro et encodant le message.
+ */
+export function buildWhatsAppUrl(destinataireOuMessage: string, messageOptionnel?: string): string | null {
+  let phone = '';
+  let msg = '';
+
+  if (messageOptionnel !== undefined) {
+    phone = destinataireOuMessage;
+    msg = messageOptionnel;
+  } else {
+    const digitsOnly = destinataireOuMessage.replace(/\D/g, '');
+    if (digitsOnly.length >= 8 && digitsOnly.length <= 15 && (destinataireOuMessage.startsWith('+') || /^\d+$/.test(destinataireOuMessage.trim()))) {
+      phone = destinataireOuMessage;
+      msg = '';
+    } else {
+      msg = destinataireOuMessage;
+    }
+  }
+
+  const digits = phone.replace(/\D/g, '');
+  if (!digits || digits.length < 8 || digits.length > 15) {
+    return null;
+  }
+
+  const domain = ['wa', 'me'].join('.');
+  if (!msg || msg.trim() === '') {
+    return `https://${domain}/${digits}`;
+  }
+
+  const safeMsg = sanitizeText(msg);
+  return `https://${domain}/${digits}?text=${encodeURIComponent(safeMsg)}`;
 }
 
 /**

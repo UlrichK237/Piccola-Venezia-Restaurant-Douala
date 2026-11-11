@@ -5,11 +5,10 @@
 // ----------------------------------------------------------------------------
 // 1. WHATSAPP & CONTACT (SEULE SOURCE DU NUMÉRO WHATSAPP)
 // ----------------------------------------------------------------------------
-// Numéro WhatsApp pour la réception des commandes et réservations (sans + ni espaces)
-export const RESTAURANT_WHATSAPP = '237699931721';
-
-// Format d'affichage pour les clients
-export const RESTAURANT_WHATSAPP_DISPLAY = '+237 6 99 93 17 21';
+// Numéro WhatsApp pour la réception des commandes et réservations lu depuis l'environnement
+const rawWhatsAppEnv = import.meta.env.VITE_WHATSAPP_NUMBER;
+const rawWhatsAppDigits = typeof rawWhatsAppEnv === 'string' ? rawWhatsAppEnv.replace(/\D/g, '') : '';
+export const RESTAURANT_WHATSAPP: string | null = rawWhatsAppDigits.length > 0 ? rawWhatsAppDigits : null;
 
 // ----------------------------------------------------------------------------
 // 2. PARAMÈTRES DES RÉSERVATIONS

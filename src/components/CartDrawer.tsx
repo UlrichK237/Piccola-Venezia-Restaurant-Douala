@@ -4,6 +4,7 @@ import { useCart } from '../context/CartContext';
 import { formatFCFA, CONDITIONS } from '../config';
 import { useModalA11y } from '../hooks/useModalA11y';
 import { nettoyerTexte } from '../lib/securite';
+import { applyCorrection } from './MenuSection';
 
 export const CartDrawer: React.FC = () => {
   const {
@@ -116,7 +117,7 @@ export const CartDrawer: React.FC = () => {
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline justify-between gap-2">
                           <h3 className="font-serif font-bold text-xs sm:text-sm text-[#2B1A12]">
-                            {item.platNom}
+                            {applyCorrection(item.platNom)}
                           </h3>
                           <span className="font-sans font-semibold text-xs sm:text-sm text-[#2B1A12] tabular-nums shrink-0">
                             {formatFCFA(item.prix * item.quantite)}
@@ -195,7 +196,7 @@ export const CartDrawer: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => updateQuantity(index, -1)}
-                          aria-label={`Diminuer la quantité de ${item.platNom}`}
+                          aria-label={`Diminuer la quantité de ${applyCorrection(item.platNom)}`}
                           className="p-1 px-2.5 text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8] transition cursor-pointer"
                         >
                           <Minus className="w-3 h-3" />
@@ -206,7 +207,7 @@ export const CartDrawer: React.FC = () => {
                         <button
                           type="button"
                           onClick={() => updateQuantity(index, 1)}
-                          aria-label={`Augmenter la quantité de ${item.platNom}`}
+                          aria-label={`Augmenter la quantité de ${applyCorrection(item.platNom)}`}
                           disabled={item.quantite >= 20 || totalItemsCount >= 40}
                           className="p-1 px-2.5 text-[#6B5446] hover:text-[#2B1A12] hover:bg-[#F0E6D8] transition disabled:opacity-40 cursor-pointer"
                         >
@@ -217,7 +218,7 @@ export const CartDrawer: React.FC = () => {
                       <button
                         type="button"
                         onClick={() => removeItem(index)}
-                        aria-label={`Supprimer ${item.platNom} du panier`}
+                        aria-label={`Supprimer ${applyCorrection(item.platNom)} du panier`}
                         className="p-1.5 text-[#A84A15]/80 hover:text-[#A84A15] hover:bg-[#F0E6D8] rounded-md transition cursor-pointer"
                       >
                         <Trash2 className="w-4 h-4" />

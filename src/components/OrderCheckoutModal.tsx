@@ -4,22 +4,24 @@ import { useCart, calculerTotal } from '../context/CartContext';
 import { ModeReception } from '../types/order';
 import {
   formatFCFA,
-  CONDITIONS,
-  RESTAURANT_WHATSAPP_DISPLAY
+  CONDITIONS
 } from '../config';
 import {
   nettoyerTexte,
   validateNom,
-  validateCameroonPhone,
+  validatePhone,
   getPhoneDigits
 } from '../lib/securite';
 import {
   buildWhatsAppUrl,
   buildSimpleWhatsAppUrl,
+  getWhatsappDigits,
   isWhatsAppUrlTooLong,
   openWhatsApp
 } from '../lib/whatsapp';
 import { useModalA11y } from '../hooks/useModalA11y';
+import { useCopier } from '../hooks/useCopier';
+import { applyCorrection } from './MenuSection';
 import { RESTAURANT_DATA } from '../data/restaurantData';
 
 interface OrderCheckoutModalProps {
@@ -55,7 +57,8 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
     adresse?: string;
   }>({});
 
-  const [copied, setCopied] = useState(false);
+  const { copier, copieStatut } = useCopier();
+  const whatsappDigits = getWhatsappDigits();
 
   if (!isCheckoutOpen) return null;
 
@@ -84,7 +87,7 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
       newErrors.nom = nomVal.error;
     }
 
-    const phoneVal = validateCameroonPhone(telephone);
+    const phoneVal = validatePhone(telephone);
     if (!phoneVal.isValid) {
       newErrors.telephone = phoneVal.error;
     }
@@ -110,7 +113,7 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
   // Construction du message WhatsApp selon Bloc E.7
   const buildOrderMessage = (): string => {
     const cleanNom = nettoyerTexte(nom, 60);
-    const phoneVal = validateCameroonPhone(telephone);
+    const phoneVal = validatePhone(telephone);
     const cleanPhone = phoneVal.isValid ? phoneVal.formatted : telephone;
     const cleanQuartier = nettoyerTexte(quartier, 120);
     const cleanAdresse = nettoyerTexte(adresse, 120);
@@ -118,7 +121,7 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
     const cleanRemarques = nettoyerTexte(remarquesGenerales, 300, { multiligne: true });
 
     const lignesPlats = items.map(item => {
-      let txt = `- ${item.quantite} x ${item.platNom} : ${formatFCFA(item.prix * item.quantite)}`;
+      let txt = `- ${item.quantite} x ${applyCorrection(item.platNom)} : ${formatFCFA(item.prix * item.quantite)}`;
       if (item.options && item.options.length > 0) {
         txt += `\n  Options : ${item.options.join(', ')}`;
       }
@@ -154,13 +157,7 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
   const simpleWhatsappUrl = buildSimpleWhatsAppUrl();
 
   const handleCopyMessage = async () => {
-    try {
-      await navigator.clipboard.writeText(messageCommande);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 2500);
-    } catch {
-      // Fallback
-    }
+    await copier(messageCommande);
   };
 
   const handleSendWhatsApp = () => {
@@ -250,20 +247,23 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
             {/* Téléphone */}
             <div className="space-y-1">
               <label htmlFor="cmd-tel" className="block text-xs font-bold uppercase tracking-wider text-[#2B1A12]">
-                Téléphone (Cameroun) *
+                Téléphone *
               </label>
               <input
                 id="cmd-tel"
                 type="tel"
-                maxLength={20}
+                maxLength={25}
                 required
                 value={telephone}
                 onChange={e => setTelephone(e.target.value)}
-                placeholder="Ex. 6 99 93 17 21"
+                placeholder="Ex. 6 99 93 17 21 ou +33 6 12 34 56 78"
                 aria-invalid={Boolean(errors.telephone)}
-                aria-describedby={errors.telephone ? 'cmd-tel-err' : undefined}
+                aria-describedby={errors.telephone ? 'cmd-tel-err' : 'cmd-tel-help'}
                 className="w-full px-3.5 py-2.5 rounded-lg bg-white border border-[#D9C8B4] text-xs sm:text-sm text-[#2B1A12] placeholder-[#8C7565] focus:outline-none focus:border-[#A84A15] transition"
               />
+              <p id="cmd-tel-help" className="text-[11px] text-[#6B5446]">
+                Numéro camerounais ou international avec indicatif
+              </p>
               {errors.telephone && (
                 <p id="cmd-tel-err" role="alert" className="text-[11px] text-red-600 font-medium">
                   {errors.telephone}
@@ -457,7 +457,7 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
                   <div key={idx} className="pt-2 first:pt-0">
                     <div className="flex justify-between font-medium text-[#2B1A12]">
                       <span>
-                        {it.quantite} x {it.platNom}
+                        {it.quantite} x {applyCorrection(it.platNom)}
                       </span>
                       <span className="tabular-nums font-semibold">
                         {formatFCFA(it.prix * it.quantite)}
@@ -505,44 +505,86 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
                   onClick={handleCopyMessage}
                   className="text-[#A84A15] hover:underline inline-flex items-center gap-1 cursor-pointer"
                 >
-                  {copied ? <Check className="w-3.5 h-3.5" /> : <Copy className="w-3.5 h-3.5" />}
-                  <span>{copied ? 'Copié !' : 'Copier'}</span>
+                  <Copy className="w-3.5 h-3.5" />
+                  <span>Copier</span>
                 </button>
               </div>
-              <pre className="p-3 bg-white rounded-lg border border-[#D9C8B4] text-[11px] text-[#2B1A12] whitespace-pre-wrap font-sans max-h-36 overflow-y-auto">
-                {messageCommande}
-              </pre>
+              <textarea
+                readOnly
+                aria-label="Message prêt à copier"
+                value={messageCommande}
+                rows={6}
+                className="w-full p-3 bg-white rounded-lg border border-[#D9C8B4] text-[11px] text-[#2B1A12] font-sans resize-none focus:outline-none focus:border-[#A84A15]"
+              />
+              {copieStatut === 'ok' && (
+                <p role="status" className="text-xs text-green-700 font-medium">
+                  Message copié
+                </p>
+              )}
+              {copieStatut === 'echec' && (
+                <p role="status" className="text-xs text-red-600 font-medium">
+                  Copie impossible : sélectionnez le texte ci-dessus et copiez-le.
+                </p>
+              )}
             </div>
 
-            {/* Boutons d'action et 3 secours visibles (Bloc B.4) */}
+            {/* Boutons d'action et secours */}
             <div className="space-y-2.5 pt-2 border-t border-[#EADFCF]">
-              <button
-                type="button"
-                onClick={handleSendWhatsApp}
-                className="w-full py-3 px-4 rounded-xl bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] font-bold text-sm flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
-              >
-                <Send className="w-4 h-4" />
-                <span>Ouvrir WhatsApp pour envoyer</span>
-              </button>
+              {whatsappDigits ? (
+                <>
+                  <button
+                    type="button"
+                    onClick={handleSendWhatsApp}
+                    className="w-full py-3 px-4 rounded-xl bg-[#EB7F36] hover:bg-[#D76E27] text-[#2B1A12] font-bold text-sm flex items-center justify-center gap-2 transition shadow-sm cursor-pointer"
+                  >
+                    <Send className="w-4 h-4" />
+                    <span>Ouvrir WhatsApp pour envoyer</span>
+                  </button>
 
-              <div className="grid grid-cols-2 gap-2 text-xs">
-                <button
-                  type="button"
-                  onClick={handleCopyMessage}
-                  className="py-2.5 px-3 rounded-lg border border-[#D9C8B4] bg-white hover:bg-[#F0E6D8] text-[#2B1A12] font-medium flex items-center justify-center gap-1.5 transition cursor-pointer"
-                >
-                  <Copy className="w-3.5 h-3.5 text-[#A84A15]" />
-                  <span>{copied ? 'Copié' : 'Copier le message'}</span>
-                </button>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <button
+                      type="button"
+                      onClick={handleCopyMessage}
+                      className="py-2.5 px-3 rounded-lg border border-[#D9C8B4] bg-white hover:bg-[#F0E6D8] text-[#2B1A12] font-medium flex items-center justify-center gap-1.5 transition cursor-pointer"
+                    >
+                      <Copy className="w-3.5 h-3.5 text-[#A84A15]" />
+                      <span>Copier le message</span>
+                    </button>
 
-                <a
-                  href={`tel:${telRestaurantDigits}`}
-                  className="py-2.5 px-3 rounded-lg border border-[#D9C8B4] bg-white hover:bg-[#F0E6D8] text-[#2B1A12] font-medium flex items-center justify-center gap-1.5 transition text-center"
-                >
-                  <Phone className="w-3.5 h-3.5 text-[#A84A15]" />
-                  <span>Appeler le restaurant</span>
-                </a>
-              </div>
+                    <a
+                      href={`tel:${telRestaurantDigits}`}
+                      className="py-2.5 px-3 rounded-lg border border-[#D9C8B4] bg-white hover:bg-[#F0E6D8] text-[#2B1A12] font-medium flex items-center justify-center gap-1.5 transition text-center"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-[#A84A15]" />
+                      <span>Appeler le restaurant</span>
+                    </a>
+                  </div>
+                </>
+              ) : (
+                <div className="p-3.5 rounded-xl bg-amber-50 border border-amber-200 space-y-3">
+                  <p className="text-xs sm:text-sm text-[#6B5446]">
+                    L'envoi par WhatsApp n'est pas disponible pour le moment. Copiez le message ou appelez le restaurant.
+                  </p>
+                  <div className="grid grid-cols-2 gap-2 text-xs">
+                    <button
+                      type="button"
+                      onClick={handleCopyMessage}
+                      className="py-2.5 px-3 rounded-lg border border-[#D9C8B4] bg-white hover:bg-[#F0E6D8] text-[#2B1A12] font-medium flex items-center justify-center gap-1.5 transition cursor-pointer"
+                    >
+                      <Copy className="w-3.5 h-3.5 text-[#A84A15]" />
+                      <span>Copier le message</span>
+                    </button>
+
+                    <a
+                      href={`tel:${telRestaurantDigits}`}
+                      className="py-2.5 px-3 rounded-lg border border-[#D9C8B4] bg-white hover:bg-[#F0E6D8] text-[#2B1A12] font-medium flex items-center justify-center gap-1.5 transition text-center"
+                    >
+                      <Phone className="w-3.5 h-3.5 text-[#A84A15]" />
+                      <span>Appeler</span>
+                    </a>
+                  </div>
+                </div>
+              )}
 
               <div className="flex justify-between items-center pt-2">
                 <button
@@ -573,7 +615,7 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
               </p>
             </div>
 
-            {/* 3 Secours visibles toujours proposés (Bloc B.4) */}
+            {/* Secours visibles */}
             <div className="p-4 rounded-xl bg-[#F0E6D8]/70 border border-[#EADFCF] space-y-3 text-left">
               <div className="text-xs font-bold text-[#2B1A12]">Options de secours :</div>
               <div className="flex flex-col gap-2">
@@ -583,7 +625,7 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
                   className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition cursor-pointer"
                 >
                   <Copy className="w-3.5 h-3.5 text-[#A84A15]" />
-                  <span>{copied ? 'Message copié !' : 'Copier le message'}</span>
+                  <span>Copier le message</span>
                 </button>
 
                 {simpleWhatsappUrl && (
@@ -602,7 +644,7 @@ export const OrderCheckoutModal: React.FC<OrderCheckoutModalProps> = ({ onOpenPr
                   className="w-full py-2.5 px-3 rounded-lg bg-white border border-[#D9C8B4] text-xs font-semibold text-[#2B1A12] flex items-center justify-center gap-2 hover:bg-[#FBF6EE] transition text-center"
                 >
                   <Phone className="w-3.5 h-3.5 text-[#A84A15]" />
-                  <span>Appeler le {RESTAURANT_WHATSAPP_DISPLAY}</span>
+                  <span>Appeler</span>
                 </a>
               </div>
             </div>

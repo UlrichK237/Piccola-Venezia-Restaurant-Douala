@@ -202,6 +202,7 @@ const allowedHosts = new Set([
   'commons.wikimedia.org',
   'creativecommons.org',
   'react.dev',
+  'tailwindcss.com',
   // Hôtes autorisés issus des crédits photos de platPhotos.json
   'www.flickr.com'
 ]);
@@ -229,6 +230,95 @@ if (fs.existsSync('dist')) {
 } else {
   console.log('[INFO] Dossier dist/ absent. Lancez npm run build pour vérifier le bloc 8.');
 }
+
+// ----------------------------------------------------------------------------
+// 9. vercel.json existe, JSON valide, CSP identique et noindex sur vercel.app
+// ----------------------------------------------------------------------------
+let vercelOk = false;
+let vercelDetails = '';
+if (fs.existsSync('vercel.json')) {
+  try {
+    const vContent = fs.readFileSync('vercel.json', 'utf8');
+    const vJson = JSON.parse(vContent);
+    const headers = fs.readFileSync('public/_headers', 'utf8');
+    const cspMatch = headers.match(/Content-Security-Policy:\s*(.+)/);
+    const rawCsp = cspMatch ? cspMatch[1].trim() : '';
+
+    const firstBlock = vJson.headers?.[0];
+    const secondBlock = vJson.headers?.[1];
+
+    const vercelCspObj = firstBlock?.headers?.find(h => h.key === 'Content-Security-Policy');
+    const vercelCsp = vercelCspObj ? vercelCspObj.value.trim() : '';
+
+    const cspMatches = rawCsp && vercelCsp && (rawCsp === vercelCsp);
+    const hasRuleApp = secondBlock?.has?.[0]?.value === '.*\\.vercel\\.app';
+    const hasNoIndex = secondBlock?.headers?.some(h => h.key === 'X-Robots-Tag' && h.value.includes('noindex'));
+
+    vercelOk = Boolean(cspMatches && hasRuleApp && hasNoIndex);
+    if (!vercelOk) {
+      vercelDetails = `cspMatches: ${cspMatches}, hasRuleApp: ${hasRuleApp}, hasNoIndex: ${hasNoIndex}`;
+    }
+  } catch (err) {
+    vercelDetails = `Erreur JSON: ${err.message}`;
+  }
+} else {
+  vercelDetails = 'Fichier vercel.json introuvable';
+}
+
+report(
+  '9. vercel.json conforme (CSP identique à public/_headers et règle noindex pour .vercel.app)',
+  vercelOk,
+  vercelDetails
+);
+
+// ----------------------------------------------------------------------------
+// 10. bun.lock n'existe pas
+// ----------------------------------------------------------------------------
+const bunLockExists = fs.existsSync('bun.lock');
+report('10. bun.lock absent du projet', !bunLockExists, bunLockExists ? 'bun.lock trouvé à la racine' : '');
+
+// ----------------------------------------------------------------------------
+// 11. Numéro en dur 237699931721 absent de src/
+// ----------------------------------------------------------------------------
+let hardcodedNumberViolations = [];
+for (const file of srcFiles) {
+  const content = fs.readFileSync(file, 'utf8');
+  if (content.includes('237699931721')) {
+    hardcodedNumberViolations.push(file);
+  }
+}
+report(
+  '11. Numéro en dur 237699931721 absent de src/',
+  hardcodedNumberViolations.length === 0,
+  hardcodedNumberViolations.join(', ')
+);
+
+// ----------------------------------------------------------------------------
+// 12. .env.example contient VITE_WHATSAPP_NUMBER
+// ----------------------------------------------------------------------------
+let envExampleOk = false;
+if (fs.existsSync('.env.example')) {
+  const envContent = fs.readFileSync('.env.example', 'utf8');
+  envExampleOk = envContent.includes('VITE_WHATSAPP_NUMBER');
+}
+report('12. .env.example contient VITE_WHATSAPP_NUMBER', envExampleOk);
+
+// ----------------------------------------------------------------------------
+// 13. public/favicon.svg existe et est référencé dans index.html
+// ----------------------------------------------------------------------------
+const faviconSvgExists = fs.existsSync('public/favicon.svg');
+const indexHasFavicon = indexHtml.includes('/favicon.svg');
+report(
+  '13. public/favicon.svg existe et est référencé dans index.html',
+  faviconSvgExists && indexHasFavicon,
+  `faviconExists: ${faviconSvgExists}, indexHasFavicon: ${indexHasFavicon}`
+);
+
+// ----------------------------------------------------------------------------
+// 14. package.json contient le script "verif"
+// ----------------------------------------------------------------------------
+const hasVerifScript = typeof pkg.scripts?.verif === 'string' && pkg.scripts.verif.includes('scripts/verif-securite.mjs');
+report('14. package.json contient le script "verif"', hasVerifScript);
 
 console.log('------------------------------------------------------------');
 if (hasError) {
