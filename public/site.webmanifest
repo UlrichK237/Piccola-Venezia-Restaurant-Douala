@@ -1,0 +1,17 @@
+{
+  "name": "L'italien Piccola Venezia",
+  "short_name": "Piccola Venezia",
+  "lang": "fr",
+  "start_url": "/",
+  "display": "browser",
+  "background_color": "#FBF6EE",
+  "theme_color": "#EB7F36",
+  "icons": [
+    {
+      "src": "/icon-192.png",
+      "sizes": "192x192",
+      "type": "image/png",
+      "purpose": "any"
+    }
+  ]
+}
