@@ -5,6 +5,26 @@ import { formatFCFA, CONDITIONS } from '../config';
 import { useModalA11y } from '../hooks/useModalA11y';
 import { nettoyerTexte } from '../lib/securite';
 import { applyCorrection } from './MenuSection';
+import platPhotosData from '../data/platPhotos.json';
+
+const platPhotos = platPhotosData as Record<string, { fichier: string }>;
+
+// Petite photo du plat dans le panier (la clé du panier est la même que celle des photos)
+const MiniaturePlat: React.FC<{ cle: string }> = ({ cle }) => {
+  const photo = platPhotos[cle]?.fichier;
+  if (!photo) return null;
+  return (
+    <img
+      src={photo}
+      alt=""
+      width={56}
+      height={56}
+      loading="lazy"
+      decoding="async"
+      className="w-14 h-14 rounded-lg object-cover border border-[#EADFCF] shrink-0"
+    />
+  );
+};
 
 export const CartDrawer: React.FC = () => {
   const {
@@ -114,6 +134,7 @@ export const CartDrawer: React.FC = () => {
                 {items.map((item, index) => (
                   <li key={`${item.id}-${index}`} className="pt-3 first:pt-0 flex flex-col gap-2">
                     <div className="flex items-start justify-between gap-2">
+                      <MiniaturePlat cle={item.id} />
                       <div className="flex-1 min-w-0">
                         <div className="flex items-baseline justify-between gap-2">
                           <h3 className="font-serif font-bold text-xs sm:text-sm text-[#2B1A12]">
